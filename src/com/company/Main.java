@@ -45,10 +45,17 @@ public class Main {
 
     public static void main(String[] args) {
 
-        Config c = new Config("config.txt");
-        System.out.println(c.getParams().get("BUFFER_SIZE"));
+//        Config c = new Config("config.txt");
+//        System.out.println(c.getParams().get("BUFFER_SIZE"));
+            byte s[] = new byte[10];
+            s[0] = 33;
+        try  {
+            FileInputStream inp = new FileInputStream("config.txt");
 
-//       if (args.length != 1){
+        }  catch (IOException e) {
+            e.printStackTrace();
+        }
+        //       if (args.length != 1){
 //            System.out.println("Invalid amount of command-line arguments: must be 1");
 //       }
 //        else{
