@@ -9,7 +9,6 @@ import java.util.Scanner;
 import com.company.Grammar;
 public class Config {
 
-//    private final Grammar grammar = new Grammar(new String[]{"BUFFER_SIZE", "OUTPUT_FILE","INPUT_FILE","ACTION"});
     private final HashMap<String, String> params = new HashMap<>();
     private boolean validConfg = false;
 
