@@ -4,7 +4,7 @@ import com.company.Writer;
 import com.company.Config;
 
 import java.util.HashMap;
-
+import java.util.Set;
 
 public class Executor {
 
@@ -12,25 +12,62 @@ public class Executor {
         COMPRESS,
         DECOMPRESS
     }
+    public enum Parameters {
+        INPUT_FILE,
+        OUTPUT_FILE,
+        ACTION,
+        TABLE,
+        BUFFER_SIZE
+    }
 
     private Reader reader;
     private Writer writer;
     private Config confg;
-    private final Grammar confgGrammar = new Grammar(new String[]{"BUFFER_SIZE", "OUTPUT_FILE","INPUT_FILE","ACTION"});
     private Action action;
+    private final HashMap<Byte,Byte> substTable = new HashMap<Byte,Byte>();
 
-    HashMap<String,String> SemanticConfigParse(Config confg, Grammar grammar){
-        HashMap<String,String> params = new HashMap<>();
-        HashMap<String,String> confgParams = confg.getParams();
+    public boolean setParams(){
+        HashMap<String,String> confgParams = this.confg.getParams();
         for (String key: confgParams.keySet()){
-            for (String validToken: grammar.getTokens()){
+            switch (Parameters.valueOf(key)){
+                case BUFFER_SIZE:
+                    try{
+                        int buffer_size = Integer.parseInt(confgParams.get(key));
+                        if (!reader.SetBuffer(buffer_size)){
+                            return false;
+                        }
+                    } catch (NumberFormatException e) {
+                        System.out.println("Buffer size value must be an integer");
+                    }
+                    break;
+                case INPUT_FILE:
+                    if (!reader.SetPath(confgParams.get(key))){
+                        return false;
+                    }
+                    break;
+                case OUTPUT_FILE:
+                    if (!writer.SetPath(confgParams.get(key))){
+                        return false;
+                    }
+                    break;
+                case ACTION:
+                    try {
+                        this.action = Action.valueOf(confgParams.get(key));
+                    } catch (IllegalArgumentException e){
+                        System.out.println("Invalid mode value: " + key);
+                    }
+                    break;
+                case TABLE:
+
+
+
 
             }
 
 
         }
 
-        return params;
+     return false;
     }
 
     public Executor(Config confg){

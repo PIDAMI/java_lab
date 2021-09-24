@@ -2,44 +2,19 @@ package com.company;
 import com.company.Config;
 
 import java.io.*;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Scanner;
+import java.util.Set;
+
+
+
 
 public class Main {
 
-    public static void f() throws IOException {
-        final byte mask = 120;
-        final int sz = 10;
-        byte k[] = new byte[sz];
-        File f = new File("a.txt");
-        FileInputStream inp = new FileInputStream(f);
-        int szRead = inp.read(k,0,sz);
-
-        inp.close();
-
-
-        System.out.println(szRead);
-        File out = new File("b.txt");
-        FileOutputStream output = new FileOutputStream(out);
-
-        for (int i = 0; i < szRead; i++){
-            k[i] = (byte) (k[i] ^ mask);
-        }
-        output.write(k,0,szRead);
-        output.close();
-
-
-        File out2 = new File("c.txt");
-        FileOutputStream output2 = new FileOutputStream(out2);
-
-        for (int i = 0; i < szRead; i++){
-            k[i] = (byte) (k[i] ^ mask);
-        }
-        output2.write(k,0,szRead);
-        output2.close();
-
-
-
-
+    public enum x {
+        A,
+        B
     }
 
 
@@ -49,7 +24,7 @@ public class Main {
 //        System.out.println(c.getParams().get("BUFFER_SIZE"));
             byte s[] = new byte[0];
 
-            System.out.println(s.length);
+        System.out.println(x.valueOf("A"));
 
         //       if (args.length != 1){
 //            System.out.println("Invalid amount of command-line arguments: must be 1");

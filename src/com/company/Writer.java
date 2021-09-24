@@ -7,19 +7,22 @@ public class Writer {
     private FileOutputStream outputStream;
 //    private byte[] buffer;
 //    private int nonEmptyBufferSize = 0;
-    public boolean validInitialization = false;
+      public boolean validInitialization = false;
 
 
-    public Writer(String path) {
+    public boolean isValidInitialization(){
+        return this.validInitialization;
+    }
+
+    public boolean SetPath(String path){
         try {
             this.outputStream = new FileOutputStream(new File(path));
-            validInitialization = true;
+            this.validInitialization = true;
 
         } catch (FileNotFoundException e){
             System.out.println("Input file not found");
         }
-
-
+        return this.validInitialization;
     }
 
     public void WriteBatch(byte[] data){

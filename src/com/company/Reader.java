@@ -10,24 +10,35 @@ public class Reader {
     private FileInputStream inputStream;
     private byte[] buffer;
     private int nonEmptyBufferSize = 0;
-    public boolean validInitialization = false;
+    public boolean validPath = false;
+    public boolean validBuffer = false;
 
+    public boolean SetPath(String path){
+        try {
+            inputStream = new FileInputStream(new File(path));
+            this.validPath = true;
+        } catch (FileNotFoundException e){
+            System.out.println("Input file not found");
+        }
+        return this.validPath;
+    }
 
-    public Reader(String path, int bufferSize) {
+    public boolean SetBuffer(int bufferSize){
         if (bufferSize < 1){
             System.out.println("Buffer size must be a positive integer");
         } else {
-            try {
-                inputStream = new FileInputStream(new File(path));
-                buffer = new byte[bufferSize];
-                validInitialization = true;
-
-            } catch (FileNotFoundException e){
-                System.out.println("Input file not found");
-            }
+            buffer = new byte[bufferSize];
+            this.validBuffer = true;
         }
-
+        return this.validBuffer;
     }
+
+    public boolean isValidInitialization(){
+        return this.validBuffer && this.validPath;
+    }
+
+
+
 
     public int ReadBatch(){
 
