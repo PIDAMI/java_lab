@@ -21,6 +21,15 @@ public class Executor {
 
     HashMap<String,String> SemanticConfigParse(Config confg, Grammar grammar){
         HashMap<String,String> params = new HashMap<>();
+        HashMap<String,String> confgParams = confg.getParams();
+        for (String key: confgParams.keySet()){
+            for (String validToken: grammar.getTokens()){
+
+            }
+
+
+        }
+
         return params;
     }
 
