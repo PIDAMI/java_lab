@@ -8,31 +8,38 @@ public class Reader {
 
     private FileInputStream inputStream;
     private byte[] buffer;
-    public boolean validPath = false;
-    public boolean validBuffer = false;
+    private boolean validPath = false;
+    private boolean validBuffer = false;
+    private ReturnCode errorState;
 
-    public boolean SetPath(String path){
+    public ReturnCode SetPath(String path){
         try {
-            inputStream = new FileInputStream(new File(path));
+            this.inputStream = new FileInputStream(new File(path));
             this.validPath = true;
         } catch (FileNotFoundException e){
             System.out.println("Input file not found");
+            this.errorState = ReturnCode.FILE_NOT_FOUND;
         }
-        return this.validPath;
+        return this.errorState;
     }
 
-    public boolean SetBuffer(int bufferSize){
+    public ReturnCode SetBuffer(int bufferSize){
         if (bufferSize < 1){
             System.out.println("Buffer size must be a positive integer");
+            this.errorState = ReturnCode.INVALID_BUFFER_SIZE;
         } else {
             buffer = new byte[bufferSize];
             this.validBuffer = true;
         }
-        return this.validBuffer;
+        return this.errorState;
     }
 
-    public boolean isValidInitialization(){
-        return this.validBuffer && this.validPath;
+    public  ReturnCode isValidInitialization(){
+        boolean validInit = this.validBuffer && this.validPath;
+        if (!validInit){
+            this.errorState = ReturnCode.INVALID_INITIALIZATION;
+        }
+        return this.errorState;
     }
 
     public int ReadBatch(){
@@ -45,6 +52,7 @@ public class Reader {
             }
         } catch (IOException e) {
             System.out.println("Error occurred while reading file");
+            this.errorState = ReturnCode.READ_ERROR;
             nonEmptyBufferSize = 0; // in both scenarios return 0 as it doesnt matter
 
         }
@@ -56,12 +64,17 @@ public class Reader {
         return buffer;
     }
 
-    public void CloseStream(){
+
+    public ReturnCode getErrorState() {return this.errorState;}
+    public ReturnCode CloseStream(){
         try {
             this.inputStream.close();
+            this.errorState = ReturnCode.SUCCESS;
         } catch (IOException e) {
             System.out.println("Error occurred while closing file");
+            this.errorState = ReturnCode.STREAM_CLOSE_ERROR;
         }
+        return this.errorState
     }
 
 }

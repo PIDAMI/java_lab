@@ -1,2 +1,13 @@
-package com.company;public class ReturnCode {
+package com.company;
+
+public enum ReturnCode {
+    SUCCESS,
+    CLA_ERROR,
+    FILE_NOT_FOUND,
+    READ_ERROR,
+    WRITE_ERROR,
+    GRAMMAR_ERROR,
+    INVALID_INITIALIZATION,
+    INVALID_BUFFER_SIZE,
+    STREAM_CLOSE_ERROR
 }

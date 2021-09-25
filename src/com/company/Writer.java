@@ -8,38 +8,46 @@ public class Writer {
 //    private byte[] buffer;
 //    private int nonEmptyBufferSize = 0;
       public boolean validInitialization = false;
-
+    private ReturnCode errorState;
 
     public boolean isValidInitialization(){
         return this.validInitialization;
     }
-
-    public boolean SetPath(String path){
+    public ReturnCode getErrorState(){return this.errorState;}
+    public ReturnCode SetPath(String path){
         try {
             this.outputStream = new FileOutputStream(new File(path));
             this.validInitialization = true;
+            this.errorState = ReturnCode.SUCCESS;
 
         } catch (FileNotFoundException e){
             System.out.println("Input file not found");
+            this.errorState = ReturnCode.FILE_NOT_FOUND;
         }
-        return this.validInitialization;
+        return this.errorState;
     }
 
-    public void WriteBatch(byte[] data, int nonZeroSize){
+    public ReturnCode WriteBatch(byte[] data, int nonZeroSize){
 
         try {
             outputStream.write(data,0,nonZeroSize);
+            this.errorState = ReturnCode.SUCCESS;
         } catch (IOException e) {
             System.out.println("Error occurred while writing to file");
+            errorState = ReturnCode.WRITE_ERROR;
         }
+        return this.errorState;
     }
 
-    public void CloseStream(){
+    public ReturnCode CloseStream(){
         try {
             outputStream.close();
+            this.errorState = ReturnCode.SUCCESS;
         } catch (IOException e) {
             System.out.println("Error occurred while writing to file");
+            this.errorState = ReturnCode.STREAM_CLOSE_ERROR;
         }
+        return this.errorState;
     }
 
 }

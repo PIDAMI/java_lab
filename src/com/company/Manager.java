@@ -1,21 +1,13 @@
 package com.company;
-import com.company.Reader;
-import com.company.Writer;
-import com.company.Config;
-
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.util.HashMap;
-import java.util.Set;
 
 public class Manager {
 
-    public enum Action {
+    private enum Action {
         DECODE,
         ENCODE
     }
-    public enum Parameters {
+    private enum Parameters {
         INPUT_FILE,
         OUTPUT_FILE,
         ACTION,
@@ -29,16 +21,20 @@ public class Manager {
     private final Executor executor = new Executor();
 //    private Config confg;
     private Action action;
+    private ReturnCode errorState;
 
 
     public boolean isValidInitialization(){
+
         return reader.isValidInitialization() && writer.isValidInitialization() && executor.isValidInitialization();
     }
+    public ReturnCode getErrorState() {return this.errorState;}
 
-    public boolean setParams(Config confg){
-        if (!confg.isValidConfg()){
+    public ReturnCode setParams(Config confg){
+        this.errorState = confg.isValidConfg();
+        if (this.errorState != ReturnCode.SUCCESS){
             System.out.println("Invalid config");
-            return false;
+            return this.errorState;
         }
 
 
@@ -120,8 +116,9 @@ public class Manager {
         CloseAll();
     }
 
-    public void CloseAll(){
-        reader.CloseStream();
+    public ReturnCode CloseAll(){
+
+        this.errorState = reader.CloseStream();
         writer.CloseStream();
     }
 
