@@ -1,5 +1,4 @@
 package com.company;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -9,7 +8,6 @@ public class Reader {
 
     private FileInputStream inputStream;
     private byte[] buffer;
-    private int nonEmptyBufferSize = 0;
     public boolean validPath = false;
     public boolean validBuffer = false;
 
@@ -37,25 +35,24 @@ public class Reader {
         return this.validBuffer && this.validPath;
     }
 
-
-
-
     public int ReadBatch(){
 
+        int nonEmptyBufferSize = 0;
         try {
             nonEmptyBufferSize = inputStream.read(buffer,0,buffer.length);
-            if (nonEmptyBufferSize == -1)
+            if (nonEmptyBufferSize == -1){ // if reached file's end
                 nonEmptyBufferSize = 0;
+            }
         } catch (IOException e) {
             System.out.println("Error occurred while reading file");
-            nonEmptyBufferSize = 0;
+            nonEmptyBufferSize = 0; // in both scenarios return 0 as it doesnt matter
+
         }
 
         return nonEmptyBufferSize;
     }
 
     public byte[] getBuffer() {
-
         return buffer;
     }
 

@@ -22,7 +22,8 @@ public class Manager {
         TABLE_PATH,
         BUFFER_SIZE
     }
-    private final Grammar confGrammar = new Grammar(new String[]{"BUFFER_SIZE", "OUTPUT_FILE","INPUT_FILE","ACTION","TABLE_PATH"});
+//    private static final Grammar confGrammar = new Grammar(new String[]{"BUFFER_SIZE", "OUTPUT_FILE",
+//                                                    "INPUT_FILE","ACTION","TABLE_PATH"});
     private final Reader reader = new Reader();
     private final Writer writer = new Writer();
     private final Executor executor = new Executor();
@@ -35,12 +36,18 @@ public class Manager {
     }
 
     public boolean setParams(Config confg){
+        if (!confg.isValidConfg()){
+            System.out.println("Invalid config");
+            return false;
+        }
+
+
         HashMap<String,String> confgParams = confg.getParams();
         for (String key: confgParams.keySet()){
-            if (!this.confGrammar.isValidToken(key)){
-                    System.out.println("Invalid config: " + key);
-                    return false;
-                }
+//            if (!confGrammar.isValidToken(key)){
+//                    System.out.println("Invalid config: " + key);
+//                    return false;
+//                }
             switch (Parameters.valueOf(key)){
                 case BUFFER_SIZE:
                     try{
@@ -50,6 +57,7 @@ public class Manager {
                         }
                     } catch (NumberFormatException e) {
                         System.out.println("Buffer size value must be an integer");
+                        return false;
                     }
                     break;
                 case INPUT_FILE:
@@ -71,7 +79,7 @@ public class Manager {
                     }
                     break;
                 case TABLE_PATH:
-                    if (!this.executor.setSubstTable(confgParams.get(key))){
+                    if (!this.executor.setTable(confgParams.get(key))){
                         return false;
                     }
                     break;
