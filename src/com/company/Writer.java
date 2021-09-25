@@ -25,10 +25,10 @@ public class Writer {
         return this.validInitialization;
     }
 
-    public void WriteBatch(byte[] data){
+    public void WriteBatch(byte[] data, int nonZeroSize){
 
         try {
-            outputStream.write(data,0,data.length);
+            outputStream.write(data,0,nonZeroSize);
         } catch (IOException e) {
             System.out.println("Error occurred while writing to file");
         }

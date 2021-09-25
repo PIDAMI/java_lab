@@ -44,6 +44,8 @@ public class Reader {
 
         try {
             nonEmptyBufferSize = inputStream.read(buffer,0,buffer.length);
+            if (nonEmptyBufferSize == -1)
+                nonEmptyBufferSize = 0;
         } catch (IOException e) {
             System.out.println("Error occurred while reading file");
             nonEmptyBufferSize = 0;

@@ -10,7 +10,7 @@ import com.company.Grammar;
 public class Config {
 
     private final HashMap<String, String> params = new HashMap<>();
-    private final Grammar grammar = new Grammar(new String[]{"BUFFER_SIZE", "OUTPUT_FILE","INPUT_FILE","ACTION","TABLE_PATH"});
+//    private final Grammar grammar = new Grammar(new String[]{"BUFFER_SIZE", "OUTPUT_FILE","INPUT_FILE","ACTION","TABLE_PATH"});
     private boolean validConfg = false;
 
     public Config(String path){
@@ -25,10 +25,10 @@ public class Config {
                     System.out.println("Improper config format at line " + numLines + ". Must be <PARAMETER>=<VALUE>");
                     break;
                 }
-                if (!this.grammar.isValidToken(tokens[0])){
-                    System.out.println("Invalid config value at line " + numLines+ " :" + tokens[0]);
-                    break;
-                }
+//                if (!grammar.isValidToken(tokens[0])){
+//                    System.out.println("Invalid config value at line " + numLines+ " :" + tokens[0]);
+//                    break;
+//                }
                 this.params.put(tokens[0],tokens[1]);
             }
             this.validConfg = true;
@@ -39,6 +39,6 @@ public class Config {
 
 
     }
-
+    public boolean isValidConfg() {return this.validConfg;}
     public HashMap<String,String> getParams() { return this.params;}
 }
