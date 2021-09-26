@@ -16,6 +16,7 @@ public class Reader {
         try {
             this.inputStream = new FileInputStream(new File(path));
             this.validPath = true;
+            this.errorState = ReturnCode.SUCCESS;
         } catch (FileNotFoundException e){
             System.out.println("Input file not found");
             this.errorState = ReturnCode.FILE_NOT_FOUND;
@@ -30,16 +31,17 @@ public class Reader {
         } else {
             buffer = new byte[bufferSize];
             this.validBuffer = true;
+            this.errorState = ReturnCode.SUCCESS;
         }
         return this.errorState;
     }
 
-    public  ReturnCode isValidInitialization(){
+    public boolean isValidInitialization(){
         boolean validInit = this.validBuffer && this.validPath;
         if (!validInit){
             this.errorState = ReturnCode.INVALID_INITIALIZATION;
         }
-        return this.errorState;
+        return validInit;
     }
 
     public int ReadBatch(){
@@ -50,6 +52,7 @@ public class Reader {
             if (nonEmptyBufferSize == -1){ // if reached file's end
                 nonEmptyBufferSize = 0;
             }
+            this.errorState = ReturnCode.SUCCESS;
         } catch (IOException e) {
             System.out.println("Error occurred while reading file");
             this.errorState = ReturnCode.READ_ERROR;
@@ -74,7 +77,7 @@ public class Reader {
             System.out.println("Error occurred while closing file");
             this.errorState = ReturnCode.STREAM_CLOSE_ERROR;
         }
-        return this.errorState
+        return this.errorState;
     }
 
 }

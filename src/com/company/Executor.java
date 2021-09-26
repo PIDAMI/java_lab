@@ -21,6 +21,7 @@ public class Executor {
         // valid table is basically 2 permutations which means
         // 2 sets(contain distinct values), each has alphabet's size (256, byte's size)
         if (table.size() < TABLE_SIZE){
+            System.out.println("Invalid table - size is less 256");
             return ReturnCode.GRAMMAR_ERROR;
         }
 
@@ -32,7 +33,8 @@ public class Executor {
 
         if (image.size() >= TABLE_SIZE)
             return ReturnCode.SUCCESS;
-        else{
+        else {
+            System.out.println("Invalid table - not injective");
             return ReturnCode.GRAMMAR_ERROR;
         }
     }

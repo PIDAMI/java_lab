@@ -11,6 +11,9 @@ public class Writer {
     private ReturnCode errorState;
 
     public boolean isValidInitialization(){
+        if (!this.validInitialization){
+            this.errorState = ReturnCode.INVALID_INITIALIZATION;
+        }
         return this.validInitialization;
     }
     public ReturnCode getErrorState(){return this.errorState;}

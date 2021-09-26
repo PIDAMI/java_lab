@@ -25,8 +25,16 @@ public class Manager {
 
 
     public boolean isValidInitialization(){
-
-        return reader.isValidInitialization() && writer.isValidInitialization() && executor.isValidInitialization();
+        if (this.reader.isValidInitialization() &&
+            this.writer.isValidInitialization() &&
+            this.executor.isValidInitialization()){
+            this.errorState = ReturnCode.SUCCESS;
+            return true;
+        }
+        else {
+            this.errorState = ReturnCode.INVALID_INITIALIZATION;
+        }
+        return false;
     }
     public ReturnCode getErrorState() {return this.errorState;}
 
@@ -48,22 +56,26 @@ public class Manager {
                 case BUFFER_SIZE:
                     try{
                         int buffer_size = Integer.parseInt(confgParams.get(key));
-                        if (!reader.SetBuffer(buffer_size)){
-                            return false;
+                        this.errorState = this.reader.SetBuffer(buffer_size);
+                        if (this.errorState != ReturnCode.SUCCESS){
+                            return this.errorState;
                         }
                     } catch (NumberFormatException e) {
                         System.out.println("Buffer size value must be an integer");
-                        return false;
+                        this.errorState = ReturnCode.INVALID_BUFFER_SIZE;
+                        return ReturnCode.INVALID_BUFFER_SIZE;
                     }
                     break;
                 case INPUT_FILE:
-                    if (!reader.SetPath(confgParams.get(key))){
-                        return false;
+                    this.errorState = this.reader.SetPath(confgParams.get(key));
+                    if (this.errorState != ReturnCode.SUCCESS){
+                        return this.errorState ;
                     }
                     break;
                 case OUTPUT_FILE:
-                    if (!writer.SetPath(confgParams.get(key))){
-                        return false;
+                    this.errorState  = this.writer.SetPath(confgParams.get(key));
+                    if (this.errorState != ReturnCode.SUCCESS){
+                        return this.errorState ;
                     }
                     break;
                 case ACTION:
@@ -71,12 +83,15 @@ public class Manager {
                         this.action = Action.valueOf(confgParams.get(key));
                     } catch (IllegalArgumentException e){
                         System.out.println("Invalid mode value: " + key);
-                        return false;
+                        this.errorState = ReturnCode.INVALID_MODE_VALUE;
+                        return this.errorState ;
                     }
                     break;
                 case TABLE_PATH:
-                    if (!this.executor.setTable(confgParams.get(key))){
-                        return false;
+                    this.errorState = this.executor.setTable(confgParams.get(key));
+                    if (this.errorState != ReturnCode.SUCCESS){
+                        System.out.println("Error in setting table");
+                        return this.errorState ;
                     }
                     break;
 
@@ -84,21 +99,22 @@ public class Manager {
 
 
         }
-
-     return true;
+        this.errorState = ReturnCode.SUCCESS;
+        return this.errorState ;
     }
 
     public Manager(Config confg){
-        if (!setParams(confg)){
+        if (setParams(confg) != ReturnCode.SUCCESS){
             System.out.println("Error while setting parameters");
         }
 
 
     }
-    public void Run(){
+    public ReturnCode Run(){
+
         if (!isValidInitialization()){
             System.out.println("Some parameters are not initialized correctly");
-            return;
+            return this.errorState;
         }
         int read_bytes = 0;
         while ((read_bytes = reader.ReadBatch()) != 0){
@@ -113,13 +129,19 @@ public class Manager {
             writer.WriteBatch(processed,read_bytes);
 
         }
-        CloseAll();
+        this.errorState = CloseAll();
+        return this.errorState;
     }
 
     public ReturnCode CloseAll(){
 
-        this.errorState = reader.CloseStream();
-        writer.CloseStream();
+        this.errorState = this.reader.CloseStream();
+        if (this.errorState != ReturnCode.SUCCESS){
+            this.writer.CloseStream();
+        } else {
+            this.errorState = this.writer.CloseStream();
+        }
+        return this.errorState;
     }
 
 }
