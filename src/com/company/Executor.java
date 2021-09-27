@@ -1,9 +1,7 @@
 package com.company;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Scanner;
@@ -124,6 +122,9 @@ public class Executor {
 
 
     public boolean isValidInitialization(){
+        if (!this.validInitialization){
+            this.errorState = ReturnCode.INVALID_INITIALIZATION;
+        }
         return this.validInitialization;
     }
 
