@@ -15,7 +15,6 @@ public class Executor {
 
     // check if table is bijection and 256 elements long
     public static ReturnCode isValidTable(HashMap<Byte,Byte> table){
-
         // valid table is basically 2 permutations which means
         // 2 sets(contain distinct values), each has alphabet's size (256, byte's size)
         if (table.size() < TABLE_SIZE){
@@ -130,7 +129,7 @@ public class Executor {
 
     public byte[] Encode(byte[] input){
         byte[] result = new byte[input.length];
-        for (int i = 0; i < input.length; i++){
+        for (int i = 0; i < input.length; ++i){
             result[i] = encoder.get(input[i]);
         }
         return result;
@@ -139,7 +138,7 @@ public class Executor {
 
     public byte[] Decode(byte[] input){
         byte[] result = new byte[input.length];
-        for (int i = 0; i < input.length; i++){
+        for (int i = 0; i < input.length; ++i){
             result[i] = decoder.get(input[i]);
         }
         return result;

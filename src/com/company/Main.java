@@ -15,6 +15,5 @@ public class Main {
             Manager m = new Manager(conf);
             m.Run();
         }
-
     }
 }

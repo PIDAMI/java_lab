@@ -17,7 +17,7 @@ public class Reader {
             this.inputStream = new FileInputStream(new File(path));
             this.validPath = true;
             this.errorState = ReturnCode.SUCCESS;
-        } catch (FileNotFoundException e){
+        } catch (FileNotFoundException e) {
             System.out.println("Input file not found");
             this.errorState = ReturnCode.FILE_NOT_FOUND;
         }
