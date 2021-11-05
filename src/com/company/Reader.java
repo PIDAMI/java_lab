@@ -1,83 +1,142 @@
 package com.company;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
+import java.io.*;
+import java.util.Arrays;
+import java.util.HashMap;
 
-public class Reader {
+import com.java_polytech.pipeline_interfaces.*;
 
-    private FileInputStream inputStream;
+public class Reader implements IReader{
+
+    private InputStream inputStream;
     private byte[] buffer;
-    private boolean validPath = false;
-    private boolean validBuffer = false;
-    private ReturnCode errorState;
+//    private boolean validPath = false;
+//    private boolean validBuffer = false;
+//    private ReturnCode errorState;
+    private IConsumer consumer;
+    private Config cnfg;
+    private final AbstractGrammar grammar = new ReaderGrammar();
+//    private RC rc;
 
-    public ReturnCode SetPath(String path){
-        try {
-            this.inputStream = new FileInputStream(new File(path));
-            this.validPath = true;
-            this.errorState = ReturnCode.SUCCESS;
-        } catch (FileNotFoundException e) {
-            System.out.println("Input file not found");
-            this.errorState = ReturnCode.FILE_NOT_FOUND;
-        }
-        return this.errorState;
-    }
 
-    public ReturnCode SetBuffer(int bufferSize){
-        if (bufferSize < 1){
-            System.out.println("Buffer size must be a positive integer");
-            this.errorState = ReturnCode.INVALID_BUFFER_SIZE;
-        } else {
-            buffer = new byte[bufferSize];
-            this.validBuffer = true;
-            this.errorState = ReturnCode.SUCCESS;
-        }
-        return this.errorState;
-    }
-
-    public boolean isValidInitialization(){
-        boolean validInit = this.validBuffer && this.validPath;
-        if (!validInit){
-            this.errorState = ReturnCode.INVALID_INITIALIZATION;
-        }
-        return validInit;
-    }
-
-    public int ReadBatch(){
-
-        int nonEmptyBufferSize = 0;
-        try {
-            nonEmptyBufferSize = inputStream.read(buffer,0,buffer.length);
-            if (nonEmptyBufferSize == -1){ // if reached file's end
-                nonEmptyBufferSize = 0;
-            }
-            this.errorState = ReturnCode.SUCCESS;
-        } catch (IOException e) {
-            System.out.println("Error occurred while reading file");
-            this.errorState = ReturnCode.READ_ERROR;
-            nonEmptyBufferSize = 0; // in both scenarios return 0 as it doesnt matter
-
-        }
-
-        return nonEmptyBufferSize;
-    }
 
     public byte[] getBuffer() {
         return buffer;
     }
 
 
-    public ReturnCode getErrorState() {return this.errorState;}
-    public ReturnCode CloseStream(){
+//    public ReturnCode getErrorState() {return this.errorState;}
+    public RC CloseStream(){
+        RC err;
         try {
             this.inputStream.close();
-            this.errorState = ReturnCode.SUCCESS;
+            err = RC.RC_SUCCESS;
         } catch (IOException e) {
-            System.out.println("Error occurred while closing file");
-            this.errorState = ReturnCode.STREAM_CLOSE_ERROR;
+            err = new RC(RC.RCWho.READER,
+                    RC.RCType.CODE_CUSTOM_ERROR,
+                    "Reader couldn't close stream.");
         }
-        return this.errorState;
+        return err;
     }
 
+    @Override
+    public RC setConfig(String cnfg) {
+        this.cnfg = new Config(grammar);
+        RC err = this.cnfg.ParseConfig(cnfg);
+        if (err != RC.RC_SUCCESS){
+            return err;
+        }
+        try{
+            int szBuffer = Integer.parseInt(this.cnfg
+                    .getParams()
+                    .get(ReaderTokens.BUFFER_SIZE.toString()));
+            if (szBuffer < 1)
+                return RC.RC_READER_CONFIG_SEMANTIC_ERROR;
+            buffer = new byte[szBuffer];
+        } catch (NumberFormatException e){
+            return RC.RC_READER_CONFIG_SEMANTIC_ERROR;
+        }
+        return RC.RC_SUCCESS;
+    }
+
+    @Override
+    public RC setConsumer(IConsumer consumer) {
+        this.consumer = consumer;
+        return RC.RC_SUCCESS;
+    }
+
+    @Override
+    public RC setInputStream(InputStream inputStream) {
+        this.inputStream = inputStream;
+        return RC.RC_SUCCESS;
+    }
+
+    @Override
+    public RC run() {
+        int nonEmptyBufSize;
+        do {
+            try {
+                nonEmptyBufSize = inputStream.read(buffer, 0, buffer.length);
+            } catch (IOException e) {
+                return RC.RC_READER_FAILED_TO_READ;
+            }
+            byte[] data = Arrays.copyOf(buffer, nonEmptyBufSize);
+            RC err = consumer.consume(data);
+            if (!err.equals(RC.RC_SUCCESS))
+                return err;
+        } while (nonEmptyBufSize > 0);
+        RC err = consumer.consume(null); // reached file's end
+        if (!err.equals(RC.RC_SUCCESS))
+            return err;
+        err = CloseStream();
+        return err;
+    }
+
+
+
+    //
+//    public ReturnCode SetPath(FileInputStream file){
+//        this.inputStream = file;
+//        this.validPath = true;
+//        this.errorState = ReturnCode.SUCCESS;
+//        return this.errorState;
+//    }
+//
+//    public ReturnCode SetBuffer(int bufferSize){
+//        if (bufferSize < 1){
+//            System.out.println("Buffer size must be a positive integer");
+//            this.errorState = ReturnCode.INVALID_BUFFER_SIZE;
+//        } else {
+//            buffer = new byte[bufferSize];
+//            this.validBuffer = true;
+//            this.errorState = ReturnCode.SUCCESS;
+//        }
+//        return this.errorState;
+//    }
+//
+//    public boolean isValidInitialization(){
+//        boolean validInit = this.validBuffer && this.validPath;
+//        if (!validInit){
+//            this.errorState = ReturnCode.INVALID_INITIALIZATION;
+//        }
+//        return validInit;
+//    }
+
+//    public int ReadBatch(){
+//
+//        int nonEmptyBufferSize = 0;
+//        try {
+//            nonEmptyBufferSize = inputStream.read(buffer,0,buffer.length);
+////            if (nonEmptyBufferSize == -1){ // if reached file's end
+////                nonEmptyBufferSize = 0;
+////            }
+//            this.errorState = ReturnCode.SUCCESS;
+//        } catch (IOException e) {
+//            System.out.println("Error occurred while reading file");
+//            this.errorState = ReturnCode.READ_ERROR;
+//            nonEmptyBufferSize = 0; // in both scenarios return 0 as it doesnt matter
+//
+//        }
+//
+//        return nonEmptyBufferSize;
+//    }
 }

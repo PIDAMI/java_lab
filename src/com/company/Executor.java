@@ -1,91 +1,145 @@
 package com.company;
 
+import com.java_polytech.pipeline_interfaces.IConsumer;
+import com.java_polytech.pipeline_interfaces.IExecutor;
+import com.java_polytech.pipeline_interfaces.RC;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Scanner;
+import java.util.stream.Collectors;
 
-public class Executor {
-
-    public static final String TABLE_DELIMITER="=";
-    public static final int TOKENS_PER_LINE = 2;
-    public static final int TABLE_SIZE = 256;
-    private ReturnCode errorState;
-
-    // check if table is bijection and 256 elements long
-    public static ReturnCode isValidTable(HashMap<Byte,Byte> table){
-        // valid table is basically 2 permutations which means
-        // 2 sets(contain distinct values), each has alphabet's size (256, byte's size)
-        if (table.size() < TABLE_SIZE){
-            System.out.println("Invalid table - size is less 256");
-            return ReturnCode.GRAMMAR_ERROR;
-        }
-
-        HashSet<Byte> image = new HashSet<Byte>();
-        for (Byte b: table.keySet()){
-            image.add(table.get(b));
-        }
+public class Executor implements IExecutor {
 
 
-        if (image.size() >= TABLE_SIZE)
-            return ReturnCode.SUCCESS;
-        else {
-            System.out.println("Invalid table - not injective");
-            return ReturnCode.GRAMMAR_ERROR;
-        }
+    enum Action{
+        ENCODE,
+        DECODE
     }
 
-    // check if line's format is <X>=<Y>, X,Y - decimal signed bytes
-    public static ReturnCode isValidGrammarly(String word){
-        try{
-            String[] tokens = word.split(Executor.TABLE_DELIMITER);
-            if (tokens.length != Executor.TOKENS_PER_LINE) {
-                System.out.println("Invalid table format. Line contains 2 tokens separated by '='");
-                return ReturnCode.GRAMMAR_ERROR;
-            }
-            byte LeftByte = Byte.parseByte(tokens[0]);
-            byte RightByte = Byte.parseByte(tokens[1]);
-        } catch (NumberFormatException e){
-            System.out.println("Invalid config format: tokens must be decimal integers in range -127 to 128");
-            return ReturnCode.GRAMMAR_ERROR;
-        }
-
-        return ReturnCode.SUCCESS;
-    }
-
+    private final HashMap<Byte,Byte> table = new HashMap<>();
     private final HashMap<Byte,Byte> encoder = new HashMap<Byte,Byte>();
     private final HashMap<Byte,Byte> decoder = new HashMap<Byte,Byte>();
     private boolean validInitialization = false;
+    private Config cnfg;
+    private Action action;
+    private String tablePath;
+    public static final String TABLE_DELIMITER="=";
+//    public static final int TOKENS_PER_LINE = 2;
+    public static final int TABLE_SIZE = 256;
+    private final AbstractGrammar grammar = new ExecutorGrammar();
+//    private ReturnCode errorState;
 
-    public ReturnCode setTable(String path) {
-        try (Scanner scanner = new Scanner(new File(path))) {
+    @Override
+    public RC setConfig(String path) {
+        this.cnfg = new Config(grammar);
+        RC err = this.cnfg.ParseConfig(path);
+        if (!err.equals(RC.RC_SUCCESS))
+            return err;
+        HashMap<String,String> params = this.cnfg.getParams();
+        for (String token:params.keySet()){
+            switch (ExecutorTokens.valueOf(token)){
+                case ACTION:
+                    try{
+                        this.action = Action.valueOf(params.get(token));
+                    } catch (IllegalArgumentException e){
+                        return new RC(RC.RCWho.EXECUTOR,
+                                RC.RCType.CODE_CUSTOM_ERROR,
+                                "Invalid executor's action - can only be ENCODE or DECODE");
+                    }
+                case TABLE_PATH:
+                    this.tablePath = params.get(token);
+            }
+        }
+        setTable()
+
+
+        return RC.RC_SUCCESS;
+    }
+
+    @Override
+    public RC consume(byte[] bytes) {
+        return null;
+    }
+
+    @Override
+    public RC setConsumer(IConsumer iConsumer) {
+        return null;
+    }
+
+    // check if table is bijection and 256 elements long
+    public static RC isValidTable(HashMap<Byte,Byte> table){
+        RC invalid_size_err = new RC(RC.RCWho.EXECUTOR,
+                RC.RCType.CODE_CUSTOM_ERROR,
+                "Invalid table: size not equal to " + Executor.TABLE_SIZE);
+        // valid table is basically 2 permutations which means
+        // 2 sets(contain distinct values), each has alphabet's size (256, byte's size)
+        if (table.size() != TABLE_SIZE){
+            return invalid_size_err;
+        }
+
+        HashSet<Byte> image = new HashSet<Byte>();
+        int unique_values = new HashSet<>(table.values()).size();
+
+        if (unique_values != TABLE_SIZE)
+            return invalid_size_err;
+        else {
+            return RC.RC_SUCCESS;
+        }
+    }
+
+    // check if line's format is <X>=<Y>,
+    // X,Y - decimal signed integers representing java bytes
+    public static RC isValidGrammarly(String word){
+        try{
+            String[] tokens = word.split(Executor.TABLE_DELIMITER);
+            byte LeftByte = Byte.parseByte(tokens[0]);
+            byte RightByte = Byte.parseByte(tokens[1]);
+        } catch (NumberFormatException e){
+            return new RC(RC.RCWho.EXECUTOR,
+                    RC.RCType.CODE_CUSTOM_ERROR,
+                    "Invalid table format: tokens must be decimal integers in range -127 to 128");
+        }
+        return RC.RC_SUCCESS;
+    }
+
+
+
+    public RC setTable(Action action) {
+        int key_index;
+        int val_index;
+        if (action == Action.ENCODE){ // so there's no need to check every iteration
+            key_index = 0;
+            val_index = 1;
+        } else {
+            key_index = 1;
+            val_index = 0;
+        }
+        try (Scanner scanner = new Scanner(new File(this.tablePath))) {
             String line;
+            RC err;
             while (scanner.hasNext()) {
                 line = scanner.nextLine();
                 String[] tokens = line.split(TABLE_DELIMITER);
-                this.errorState = Executor.isValidGrammarly(line);
-                if (this.errorState == ReturnCode.GRAMMAR_ERROR) {
-                    return ReturnCode.GRAMMAR_ERROR;
-                }
-                byte x = Byte.parseByte(tokens[0]);
-                byte y = Byte.parseByte(tokens[1]);
-                this.encoder.put(x, y);
-                this.decoder.put(y, x);
+                err = Executor.isValidGrammarly(line);
+                if (!err.equals(RC.RC_SUCCESS))
+                    return err;
+
+                byte key = Byte.parseByte(tokens[key_index]);
+                byte val = Byte.parseByte(tokens[val_index]);
+                this.table.put(key,val);
+
+                this.encoder.put(key, val);
+                this.decoder.put(val, key);
             }
         } catch (FileNotFoundException e) {
-            System.out.println("Table file not found");
-            this.errorState = ReturnCode.FILE_NOT_FOUND;
-            return ReturnCode.FILE_NOT_FOUND;
+            return new RC(RC.RCWho.EXECUTOR,
+                    RC.RCType.CODE_CUSTOM_ERROR,
+                    "File with substitution table not found.");
         }
-        this.errorState = isValidTable(this.decoder);
-        if (this.errorState == ReturnCode.GRAMMAR_ERROR){
-            return ReturnCode.GRAMMAR_ERROR;
-        }
-
-        this.validInitialization = true;
-
-        return this.errorState;
+        return isValidTable(this.table);
     }
 
 
@@ -143,7 +197,6 @@ public class Executor {
         }
         return result;
     }
-
 
 
 
