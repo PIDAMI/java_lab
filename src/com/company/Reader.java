@@ -25,7 +25,7 @@ public class Reader implements IReader{
 
 
 //    public ReturnCode getErrorState() {return this.errorState;}
-    public RC CloseStream(){
+    private RC CloseStream(){
         RC err;
         try {
             this.inputStream.close();
@@ -76,10 +76,15 @@ public class Reader implements IReader{
         do {
             try {
                 nonEmptyBufSize = inputStream.read(buffer, 0, buffer.length);
+                if (nonEmptyBufSize < 0)
+                    break;
             } catch (IOException e) {
                 return RC.RC_READER_FAILED_TO_READ;
             }
             byte[] data = Arrays.copyOf(buffer, nonEmptyBufSize);
+            System.out.println("readLen: "+nonEmptyBufSize);
+            if (nonEmptyBufSize > 0)
+                System.out.println("first byte: " + data[0]);
             RC err = consumer.consume(data);
             if (!err.equals(RC.RC_SUCCESS))
                 return err;

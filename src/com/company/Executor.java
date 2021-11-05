@@ -22,15 +22,13 @@ public class Executor implements IExecutor {
     private final HashMap<Byte,Byte> table = new HashMap<>();
     private final HashMap<Byte,Byte> encoder = new HashMap<Byte,Byte>();
     private final HashMap<Byte,Byte> decoder = new HashMap<Byte,Byte>();
-    private boolean validInitialization = false;
     private Config cnfg;
     private Action action;
     private String tablePath;
     public static final String TABLE_DELIMITER="=";
-//    public static final int TOKENS_PER_LINE = 2;
     public static final int TABLE_SIZE = 256;
     private final AbstractGrammar grammar = new ExecutorGrammar();
-//    private ReturnCode errorState;
+    private IConsumer consumer;
 
     @Override
     public RC setConfig(String path) {
@@ -49,24 +47,31 @@ public class Executor implements IExecutor {
                                 RC.RCType.CODE_CUSTOM_ERROR,
                                 "Invalid executor's action - can only be ENCODE or DECODE");
                     }
+                    break;
                 case TABLE_PATH:
                     this.tablePath = params.get(token);
+                    break;
             }
         }
-        setTable()
-
-
-        return RC.RC_SUCCESS;
+        return loadTable();
     }
+
 
     @Override
     public RC consume(byte[] bytes) {
-        return null;
+        if (bytes == null)
+            return consumer.consume(null);
+        byte[] result = new byte[bytes.length];
+        for (int i = 0; i < bytes.length; ++i){
+            result[i] = encoder.get(bytes[i]);
+        }
+        return consumer.consume(result);
     }
 
     @Override
     public RC setConsumer(IConsumer iConsumer) {
-        return null;
+        this.consumer = iConsumer;
+        return RC.RC_SUCCESS;
     }
 
     // check if table is bijection and 256 elements long
@@ -107,10 +112,10 @@ public class Executor implements IExecutor {
 
 
 
-    public RC setTable(Action action) {
+    public RC loadTable() {
         int key_index;
         int val_index;
-        if (action == Action.ENCODE){ // so there's no need to check every iteration
+        if (this.action == Action.ENCODE){ // so there's no need to check every iteration
             key_index = 0;
             val_index = 1;
         } else {
@@ -174,12 +179,12 @@ public class Executor implements IExecutor {
 //    }
 
 
-    public boolean isValidInitialization(){
-        if (!this.validInitialization){
-            this.errorState = ReturnCode.INVALID_INITIALIZATION;
-        }
-        return this.validInitialization;
-    }
+//    public boolean isValidInitialization(){
+//        if (!this.validInitialization){
+//            this.errorState = ReturnCode.INVALID_INITIALIZATION;
+//        }
+//        return this.validInitialization;
+//    }
 
     public byte[] Encode(byte[] input){
         byte[] result = new byte[input.length];

@@ -1,29 +1,122 @@
-//package com.company;
-//import java.util.HashMap;
-//
-//public class Manager {
-//
-//    private enum Action {
-//        DECODE,
-//        ENCODE
-//    }
-//    private enum Parameters {
-//        INPUT_FILE,
-//        OUTPUT_FILE,
-//        ACTION,
-//        TABLE_PATH,
-//        BUFFER_SIZE
-//    }
-////    private static final Grammar confGrammar = new Grammar(new String[]{"BUFFER_SIZE", "OUTPUT_FILE",
-////                                                    "INPUT_FILE","ACTION","TABLE_PATH"});
-//    private final Reader reader = new Reader();
-//    private final Writer writer = new Writer();
-//    private final Executor executor = new Executor();
-////    private Config confg;
-//    private Action action;
+package com.company;
+import com.java_polytech.pipeline_interfaces.*;
+
+import java.io.*;
+import java.util.HashMap;
+
+public class Manager implements IConfigurable {
+
+
+    enum ManagerTokens{
+        INPUT_FILE,
+        OUTPUT_FILE,
+        READER_CONFIG_FILE,
+        WRITER_CONFIG_FILE,
+        EXECUTOR_CONFIG_FILE
+    }
+
+
+    private OutputStream outputStream;
+    private InputStream inputStream;
+    private String readerConfig;
+    private String executorConfig;
+    private String writerConfig;
+
+    private final IReader reader = new Reader();
+    private final IWriter writer = new Writer();
+    private final IExecutor executor = new Executor();
+    private AbstractGrammar grammar = new ManagerGrammar();
+
+
+    @Override
+    public RC setConfig(String path) {
+        Config cnfg = new Config(grammar);
+        RC err = cnfg.ParseConfig(path);
+        if (err != RC.RC_SUCCESS){
+            return err;
+        }
+        HashMap<String,String> params = cnfg.getParams();
+        for (String token:params.keySet()){
+            String value = params.get(token);
+            switch (ManagerTokens.valueOf(token)){
+                case INPUT_FILE:
+                    try {
+                        this.inputStream = new FileInputStream(value);
+                    } catch (FileNotFoundException e) {
+                        return RC.RC_MANAGER_INVALID_INPUT_FILE;
+                    }
+                    break;
+                case OUTPUT_FILE:
+                    try {
+                        this.outputStream = new FileOutputStream(value);
+                    } catch (FileNotFoundException e) {
+                        return RC.RC_MANAGER_INVALID_OUTPUT_FILE;
+                    }
+                    break;
+                case READER_CONFIG_FILE:
+                    this.readerConfig = value;
+                    break;
+                case WRITER_CONFIG_FILE:
+                    this.writerConfig = value;
+                    break;
+                case EXECUTOR_CONFIG_FILE:
+                    this.executorConfig = value;
+                    break;
+            }
+        }
+        return RC.RC_SUCCESS;
+    }
+
+    private RC setReader(){
+        RC err = this.reader.setConfig(readerConfig);
+        if (!err.equals(RC.RC_SUCCESS))
+            return err;
+        err = this.reader.setInputStream(inputStream);
+        if (!err.equals(RC.RC_SUCCESS))
+            return err;
+        return this.reader.setConsumer(executor);
+    }
+
+    private RC setWriter(){
+        RC err = this.writer.setConfig(this.writerConfig);
+        if (!err.equals(RC.RC_SUCCESS))
+            return err;
+        return this.writer.setOutputStream(this.outputStream);
+    }
+
+    private RC setExecutor(){
+        RC err = this.executor.setConfig(this.executorConfig);
+        if (!err.equals(RC.RC_SUCCESS))
+            return err;
+        return this.executor.setConsumer(this.writer);
+    }
+
+
+    public RC BuildPipeline(String path) {
+
+        RC err = setConfig(path);
+        if (!err.equals(RC.RC_SUCCESS))
+            return err;
+
+        err = setReader();
+        if (!err.equals(RC.RC_SUCCESS))
+            return err;
+
+        err = setExecutor();
+        if (!err.equals(RC.RC_SUCCESS))
+            return err;
+
+        err = setWriter();
+        if (!err.equals(RC.RC_SUCCESS))
+            return err;
+
+        return reader.run();
+    }
+
+
 //    private ReturnCode errorState;
-//
-//
+
+
 //    public boolean isValidInitialization(){
 //        if (this.reader.isValidInitialization() &&
 //            this.writer.isValidInitialization() &&
@@ -44,14 +137,14 @@
 //            System.out.println("Invalid config");
 //            return this.errorState;
 //        }
-//
-//
+
+
 //        HashMap<String,String> confgParams = confg.getParams();
 //        for (String key: confgParams.keySet()){
-////            if (!confGrammar.isValidToken(key)){
-////                    System.out.println("Invalid config: " + key);
-////                    return false;
-////                }
+//            if (!confGrammar.isValidToken(key)){
+//                    System.out.println("Invalid config: " + key);
+//                    return false;
+//                }
 //            switch (Parameters.valueOf(key)){
 //                case BUFFER_SIZE:
 //                    try{
@@ -102,14 +195,14 @@
 //        this.errorState = ReturnCode.SUCCESS;
 //        return this.errorState ;
 //    }
-//
+
 //    public Manager(Config confg){
 //        if (setParams(confg) != ReturnCode.SUCCESS){
 //            System.out.println("Error while setting parameters");
 //        }
-//
-//
-//    }
+
+
+
 //    public ReturnCode Run(){
 //
 //        if (!isValidInitialization()){
@@ -143,5 +236,5 @@
 //        }
 //        return this.errorState;
 //    }
-//
-//}
+
+}
