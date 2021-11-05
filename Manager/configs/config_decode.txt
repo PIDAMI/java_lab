@@ -1,0 +1,5 @@
+INPUT_FILE=tmp.txt
+OUTPUT_FILE=decode.txt
+READER_CONFIG_FILE=Reader_config.txt
+WRITER_CONFIG_FILE=Writer_config.txt
+EXECUTOR_CONFIG_FILE=Executor_config.txt
