@@ -1,4 +1,3 @@
-package com.company;
 import com.java_polytech.pipeline_interfaces.*;
 
 import java.util.Arrays;

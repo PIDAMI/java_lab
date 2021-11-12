@@ -1,4 +1,3 @@
-package com.company;
 import java.io.*;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -9,31 +8,27 @@ public class Reader implements IReader{
 
     private InputStream inputStream;
     private byte[] buffer;
-//    private boolean validPath = false;
-//    private boolean validBuffer = false;
-//    private ReturnCode errorState;
     private IConsumer consumer;
     private Config cnfg;
     private final AbstractGrammar grammar = new ReaderGrammar();
-//    private RC rc;
 
 
+    private final static RC RC_READER_CLOSE_STREAM_ERROR = new RC(RC.RCWho.READER,
+            RC.RCType.CODE_CUSTOM_ERROR,
+            "Reader couldn't close stream.");
 
     public byte[] getBuffer() {
         return buffer;
     }
 
 
-//    public ReturnCode getErrorState() {return this.errorState;}
     private RC CloseStream(){
         RC err;
         try {
             this.inputStream.close();
             err = RC.RC_SUCCESS;
         } catch (IOException e) {
-            err = new RC(RC.RCWho.READER,
-                    RC.RCType.CODE_CUSTOM_ERROR,
-                    "Reader couldn't close stream.");
+            err = RC_READER_CLOSE_STREAM_ERROR;
         }
         return err;
     }
@@ -82,9 +77,6 @@ public class Reader implements IReader{
                 return RC.RC_READER_FAILED_TO_READ;
             }
             byte[] data = Arrays.copyOf(buffer, nonEmptyBufSize);
-            System.out.println("readLen: "+nonEmptyBufSize);
-            if (nonEmptyBufSize > 0)
-                System.out.println("first byte: " + data[0]);
             RC err = consumer.consume(data);
             if (!err.equals(RC.RC_SUCCESS))
                 return err;

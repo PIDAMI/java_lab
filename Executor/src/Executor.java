@@ -1,5 +1,3 @@
-package com.company;
-
 import com.java_polytech.pipeline_interfaces.IConsumer;
 import com.java_polytech.pipeline_interfaces.IExecutor;
 import com.java_polytech.pipeline_interfaces.RC;
@@ -14,14 +12,31 @@ import java.util.stream.Collectors;
 public class Executor implements IExecutor {
 
 
-    enum Action{
+    private enum Action{
         ENCODE,
         DECODE
     }
 
+
+    private final static RC RC_INVALID_ACTION = new RC(RC.RCWho.EXECUTOR,
+            RC.RCType.CODE_CUSTOM_ERROR,
+            "Invalid executor's action - can only be ENCODE or DECODE");
+
+    private final static RC RC_INVALID_TABLE_SIZE = new RC(RC.RCWho.EXECUTOR,
+            RC.RCType.CODE_CUSTOM_ERROR,
+            "Invalid table: there must be " + Executor.TABLE_SIZE + "unique entries");
+    private final static RC RC_INVALID_TABLE_VALUE = new RC(RC.RCWho.EXECUTOR,
+            RC.RCType.CODE_CUSTOM_ERROR,
+            "Invalid table format: tokens must be decimal integers in range -127 to 128");
+
+    private final static RC RC_TABLE_FILE_ERROR = new RC(RC.RCWho.EXECUTOR,
+            RC.RCType.CODE_CUSTOM_ERROR,
+            "File with substitution table not found.");
+
+
     private final HashMap<Byte,Byte> table = new HashMap<>();
-    private final HashMap<Byte,Byte> encoder = new HashMap<Byte,Byte>();
-    private final HashMap<Byte,Byte> decoder = new HashMap<Byte,Byte>();
+//    private final HashMap<Byte,Byte> encoder = new HashMap<Byte,Byte>();
+//    private final HashMap<Byte,Byte> decoder = new HashMap<Byte,Byte>();
     private Config cnfg;
     private Action action;
     private String tablePath;
@@ -43,9 +58,7 @@ public class Executor implements IExecutor {
                     try{
                         this.action = Action.valueOf(params.get(token));
                     } catch (IllegalArgumentException e){
-                        return new RC(RC.RCWho.EXECUTOR,
-                                RC.RCType.CODE_CUSTOM_ERROR,
-                                "Invalid executor's action - can only be ENCODE or DECODE");
+                        return RC_INVALID_ACTION;
                     }
                     break;
                 case TABLE_PATH:
@@ -63,7 +76,7 @@ public class Executor implements IExecutor {
             return consumer.consume(null);
         byte[] result = new byte[bytes.length];
         for (int i = 0; i < bytes.length; ++i){
-            result[i] = encoder.get(bytes[i]);
+            result[i] = table.get(bytes[i]);
         }
         return consumer.consume(result);
     }
@@ -76,20 +89,17 @@ public class Executor implements IExecutor {
 
     // check if table is bijection and 256 elements long
     public static RC isValidTable(HashMap<Byte,Byte> table){
-        RC invalid_size_err = new RC(RC.RCWho.EXECUTOR,
-                RC.RCType.CODE_CUSTOM_ERROR,
-                "Invalid table: size not equal to " + Executor.TABLE_SIZE);
+
         // valid table is basically 2 permutations which means
         // 2 sets(contain distinct values), each has alphabet's size (256, byte's size)
         if (table.size() != TABLE_SIZE){
-            return invalid_size_err;
+            return RC_INVALID_TABLE_SIZE;
         }
 
-        HashSet<Byte> image = new HashSet<Byte>();
         int unique_values = new HashSet<>(table.values()).size();
 
         if (unique_values != TABLE_SIZE)
-            return invalid_size_err;
+            return RC_INVALID_TABLE_SIZE;
         else {
             return RC.RC_SUCCESS;
         }
@@ -100,12 +110,10 @@ public class Executor implements IExecutor {
     public static RC isValidGrammarly(String word){
         try{
             String[] tokens = word.split(Executor.TABLE_DELIMITER);
-            byte LeftByte = Byte.parseByte(tokens[0]);
-            byte RightByte = Byte.parseByte(tokens[1]);
+            byte leftByte = Byte.parseByte(tokens[0]);
+            byte rightByte = Byte.parseByte(tokens[1]);
         } catch (NumberFormatException e){
-            return new RC(RC.RCWho.EXECUTOR,
-                    RC.RCType.CODE_CUSTOM_ERROR,
-                    "Invalid table format: tokens must be decimal integers in range -127 to 128");
+            return RC_INVALID_TABLE_VALUE;
         }
         return RC.RC_SUCCESS;
     }
@@ -113,14 +121,14 @@ public class Executor implements IExecutor {
 
 
     public RC loadTable() {
-        int key_index;
-        int val_index;
-        if (this.action == Action.ENCODE){ // so there's no need to check every iteration
-            key_index = 0;
-            val_index = 1;
+        int keyIndex;
+        int valIndex;
+        if (this.action == Action.ENCODE){
+            keyIndex = 0;
+            valIndex = 1;
         } else {
-            key_index = 1;
-            val_index = 0;
+            keyIndex = 1;
+            valIndex = 0;
         }
         try (Scanner scanner = new Scanner(new File(this.tablePath))) {
             String line;
@@ -132,17 +140,13 @@ public class Executor implements IExecutor {
                 if (!err.equals(RC.RC_SUCCESS))
                     return err;
 
-                byte key = Byte.parseByte(tokens[key_index]);
-                byte val = Byte.parseByte(tokens[val_index]);
+                byte key = Byte.parseByte(tokens[keyIndex]);
+                byte val = Byte.parseByte(tokens[valIndex]);
                 this.table.put(key,val);
 
-                this.encoder.put(key, val);
-                this.decoder.put(val, key);
             }
         } catch (FileNotFoundException e) {
-            return new RC(RC.RCWho.EXECUTOR,
-                    RC.RCType.CODE_CUSTOM_ERROR,
-                    "File with substitution table not found.");
+            return RC_TABLE_FILE_ERROR;
         }
         return isValidTable(this.table);
     }
@@ -183,25 +187,29 @@ public class Executor implements IExecutor {
 //        if (!this.validInitialization){
 //            this.errorState = ReturnCode.INVALID_INITIALIZATION;
 //        }
+//    public boolean setSubstTable(String path){
+//        try {
+//            FileInputStream inputStream = new FileInputStream(new File(path));
+//
 //        return this.validInitialization;
 //    }
 
-    public byte[] Encode(byte[] input){
-        byte[] result = new byte[input.length];
-        for (int i = 0; i < input.length; ++i){
-            result[i] = encoder.get(input[i]);
-        }
-        return result;
-    }
-
-
-    public byte[] Decode(byte[] input){
-        byte[] result = new byte[input.length];
-        for (int i = 0; i < input.length; ++i){
-            result[i] = decoder.get(input[i]);
-        }
-        return result;
-    }
+//    public byte[] Encode(byte[] input){
+//        byte[] result = new byte[input.length];
+//        for (int i = 0; i < input.length; ++i){
+//            result[i] = encoder.get(input[i]);
+//        }
+//        return result;
+//    }
+//
+//
+//    public byte[] Decode(byte[] input){
+//        byte[] result = new byte[input.length];
+//        for (int i = 0; i < input.length; ++i){
+//            result[i] = decoder.get(input[i]);
+//        }
+//        return result;
+//    }
 
 
 

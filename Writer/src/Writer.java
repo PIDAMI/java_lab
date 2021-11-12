@@ -1,19 +1,22 @@
-package com.company;
 
-import java.io.*;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.util.HashMap;
 
 import com.java_polytech.pipeline_interfaces.*;
 
 public class Writer implements IWriter{
 
+
+
     private OutputStream outputStream;
     private Config cnfg;
     private final AbstractGrammar grammar = new WriterGrammar();
-//    private byte[] buffer;
-//    private int nonEmptyBufferSize = 0;
-//      public boolean validInitialization = false;
-//    private ReturnCode errorState;
+
+    private final static RC RC_WRITER_CLOSE_STREAM_ERROR =  new RC(
+            RC.RCWho.WRITER,
+            RC.RCType.CODE_CUSTOM_ERROR,
+            "Writer couldn't close stream.");
 
     @Override
     public RC setOutputStream(OutputStream outputStream) {
@@ -42,15 +45,14 @@ public class Writer implements IWriter{
 
         return RC.RC_SUCCESS;
     }
+
     private RC CloseStream(){
         RC err;
         try {
             outputStream.close();
            err = RC.RC_SUCCESS;
         } catch (IOException e) {
-            err = new RC(RC.RCWho.READER,
-                    RC.RCType.CODE_CUSTOM_ERROR,
-                    "Writer couldn't close stream.");
+            err = RC_WRITER_CLOSE_STREAM_ERROR;
         }
         return err;
     }

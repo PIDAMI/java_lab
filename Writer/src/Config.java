@@ -1,4 +1,3 @@
-package com.company;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -38,7 +37,6 @@ public class Config {
             return RC.RC_SUCCESS;
 
         } catch(FileNotFoundException noFileExc){
-            System.out.println("Config file not found");
             return grammar.getNoFileErrorCode();
         }
     }
