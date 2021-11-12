@@ -1,2 +1,2 @@
-ACTION=DECODE
-TABLE_PATH=substitution_table.txt
+ACTION=ENCODE
+TABLE_PATH=configs/substitution_table.txt

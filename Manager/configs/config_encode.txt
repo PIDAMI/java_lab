@@ -1,5 +1,5 @@
-INPUT_FILE=tmp.txt
-OUTPUT_FILE=decode.txt
+INPUT_FILE=message.txt
+OUTPUT_FILE=tmp.txt
 READER_NAME=Reader
 WRITER_NAME=Writer
 EXECUTOR_NAME=Executor

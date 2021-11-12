@@ -1,19 +1,34 @@
-package com.company;
 import com.java_polytech.pipeline_interfaces.*;
 
 import java.io.*;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 
 public class Manager implements IConfigurable {
 
 
-    enum ManagerTokens{
-        INPUT_FILE,
-        OUTPUT_FILE,
-        READER_CONFIG_FILE,
-        WRITER_CONFIG_FILE,
-        EXECUTOR_CONFIG_FILE
-    }
+
+
+    private static final RC RC_MANAGER_READER_NAME_ERROR = new RC(
+            RC.RCWho.MANAGER,
+            RC.RCType.CODE_CUSTOM_ERROR,
+            "Can't make instance of reader."
+    );
+
+
+    private static final RC RC_MANAGER_WRITER_NAME_ERROR = new RC(
+            RC.RCWho.MANAGER,
+            RC.RCType.CODE_CUSTOM_ERROR,
+            "Can't make instance of writer."
+    );
+
+
+    private static final RC RC_MANAGER_EXECUTOR_NAME_ERROR = new RC(
+            RC.RCWho.MANAGER,
+            RC.RCType.CODE_CUSTOM_ERROR,
+            "Can't make instance of executor."
+    );
 
 
     private OutputStream outputStream;
@@ -22,9 +37,14 @@ public class Manager implements IConfigurable {
     private String executorConfig;
     private String writerConfig;
 
-    private final IReader reader = new Reader();
-    private final IWriter writer = new Writer();
-    private final IExecutor executor = new Executor();
+    private String readerName;
+    private String executorName;
+    private String writerName;
+
+    private IReader reader;
+    private IExecutor executor;
+    private IWriter writer;
+
     private AbstractGrammar grammar = new ManagerGrammar();
 
 
@@ -39,6 +59,15 @@ public class Manager implements IConfigurable {
         for (String token:params.keySet()){
             String value = params.get(token);
             switch (ManagerTokens.valueOf(token)){
+                case READER_NAME:
+                    this.readerName = value;
+                    break;
+                case WRITER_NAME:
+                    this.writerName = value;
+                    break;
+                case EXECUTOR_NAME:
+                    this.executorName = value;
+                    break;
                 case INPUT_FILE:
                     try {
                         this.inputStream = new FileInputStream(value);
@@ -67,17 +96,34 @@ public class Manager implements IConfigurable {
         return RC.RC_SUCCESS;
     }
 
+
+    private IConfigurable createConfigurable(String className)
+            throws ClassNotFoundException, NoSuchMethodException,
+            InvocationTargetException, InstantiationException, IllegalAccessException {
+
+
+        Class<?> c = Class.forName(className);
+        Constructor<?> cons = c.getConstructor();
+        Object object = cons.newInstance();
+        return (IConfigurable) object;
+
+    }
+
     private RC setReader(){
-        RC err = this.reader.setConfig(readerConfig);
+
+
+        RC err = reader.setConfig(readerConfig);
         if (!err.equals(RC.RC_SUCCESS))
             return err;
-        err = this.reader.setInputStream(inputStream);
+        err = reader.setInputStream(inputStream);
+
         if (!err.equals(RC.RC_SUCCESS))
             return err;
-        return this.reader.setConsumer(executor);
+        return reader.setConsumer(executor);
     }
 
     private RC setWriter(){
+
         RC err = this.writer.setConfig(this.writerConfig);
         if (!err.equals(RC.RC_SUCCESS))
             return err;
@@ -85,6 +131,7 @@ public class Manager implements IConfigurable {
     }
 
     private RC setExecutor(){
+
         RC err = this.executor.setConfig(this.executorConfig);
         if (!err.equals(RC.RC_SUCCESS))
             return err;
@@ -98,13 +145,43 @@ public class Manager implements IConfigurable {
         if (!err.equals(RC.RC_SUCCESS))
             return err;
 
+        try {
+            reader = (IReader) createConfigurable(readerName);
+        } catch (ClassNotFoundException | NoSuchMethodException |
+                InvocationTargetException | InstantiationException |
+                IllegalAccessException e) {
+            e.printStackTrace();
+            return RC_MANAGER_READER_NAME_ERROR;
+        }
+
+        try {
+            executor = (IExecutor) createConfigurable(executorName);
+        } catch (ClassNotFoundException | NoSuchMethodException |
+                InvocationTargetException | InstantiationException |
+                IllegalAccessException e) {
+            return RC_MANAGER_EXECUTOR_NAME_ERROR;
+        }
+
+        try {
+            writer = (IWriter) createConfigurable(writerName);
+        } catch (ClassNotFoundException | NoSuchMethodException |
+                InvocationTargetException | InstantiationException |
+                IllegalAccessException e) {
+            return RC_MANAGER_WRITER_NAME_ERROR;
+        }
+
+
         err = setReader();
         if (!err.equals(RC.RC_SUCCESS))
             return err;
 
+
+
         err = setExecutor();
         if (!err.equals(RC.RC_SUCCESS))
             return err;
+
+
 
         err = setWriter();
         if (!err.equals(RC.RC_SUCCESS))

@@ -1,4 +1,6 @@
 import java.io.*;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
 import java.util.HashMap;
 
@@ -21,6 +23,55 @@ public class Reader implements IReader{
         return buffer;
     }
 
+
+    public Reader(){
+
+    }
+
+    private static IConfigurable createConfigurable(String className, String configPath)
+            throws ClassNotFoundException, NoSuchMethodException,
+            InvocationTargetException, InstantiationException, IllegalAccessException {
+
+        Class<?> c = Class.forName(className);
+        Constructor<?> cons = c.getConstructor();
+        Object object = cons.newInstance();
+        return (IConfigurable) object;
+    }
+
+    private static IReader setReader() {
+        IReader reader;
+        try {
+            reader = (IReader) createConfigurable("Reader", "zxc.txt");
+        } catch (ClassNotFoundException | NoSuchMethodException |
+                InvocationTargetException | InstantiationException |
+                IllegalAccessException e) {
+            e.printStackTrace();
+            return null;
+        }
+        return reader;
+    }
+
+
+    public static void main(String[] args) {
+
+            IReader r = setReader();
+            if (r==null)
+                System.out.println("null reader");
+            else {
+                r.setConsumer(null);
+                try {
+                    r.setInputStream(new FileInputStream(new File("zxc.txt")));
+                } catch (FileNotFoundException e) {
+                    e.printStackTrace();
+                }
+                RC err = r.run();
+                System.out.println(err.info);
+
+
+            }
+
+
+    }
 
     private RC CloseStream(){
         RC err;
@@ -68,6 +119,8 @@ public class Reader implements IReader{
     @Override
     public RC run() {
         int nonEmptyBufSize;
+        if (inputStream == null)
+            System.out.println("empty stream");
         do {
             try {
                 nonEmptyBufSize = inputStream.read(buffer, 0, buffer.length);
@@ -77,6 +130,8 @@ public class Reader implements IReader{
                 return RC.RC_READER_FAILED_TO_READ;
             }
             byte[] data = Arrays.copyOf(buffer, nonEmptyBufSize);
+            if (consumer == null)
+                System.out.println("empty consumer");
             RC err = consumer.consume(data);
             if (!err.equals(RC.RC_SUCCESS))
                 return err;
