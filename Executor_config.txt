@@ -1,2 +1,0 @@
-ACTION=DECODE
-TABLE_PATH=substitution_table.txt

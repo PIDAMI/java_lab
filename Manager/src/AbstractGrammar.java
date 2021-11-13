@@ -8,7 +8,7 @@ public abstract class AbstractGrammar {
 
     private final String[] tokens;
     AbstractGrammar(String[] tokens){this.tokens=tokens;}
-    String[] getTokens() {return this.tokens;}
+    //String[] getTokens() {return this.tokens;}
     public final String DEMILIMITER = "=";
     public boolean isValidToken(String val) {return Arrays.asList(tokens).contains(val);}
     public final int getNumTokens() {
