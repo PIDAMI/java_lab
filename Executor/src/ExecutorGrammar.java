@@ -2,10 +2,7 @@
 import com.java_polytech.pipeline_interfaces.RC;
 import java.util.Arrays;
 
-enum ExecutorTokens{
-    TABLE_PATH,
-    ACTION
-}
+
 
 public class ExecutorGrammar extends AbstractGrammar{
 

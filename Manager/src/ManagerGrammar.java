@@ -3,16 +3,6 @@ import com.java_polytech.pipeline_interfaces.RC;
 
 import java.util.Arrays;
 
-enum ManagerTokens{
-    READER_NAME,
-    EXECUTOR_NAME,
-    WRITER_NAME,
-    INPUT_FILE,
-    OUTPUT_FILE,
-    READER_CONFIG_FILE,
-    WRITER_CONFIG_FILE,
-    EXECUTOR_CONFIG_FILE
-}
 
 public class ManagerGrammar extends AbstractGrammar {
 

@@ -1,9 +1,7 @@
-
-
-import com.java_polytech.pipeline_interfaces.IConfigurable;
 import com.java_polytech.pipeline_interfaces.RC;
 
-import java.lang.reflect.InvocationTargetException;
+import java.util.HashMap;
+
 
 public class Main {
 
@@ -19,8 +17,6 @@ public class Main {
             RC err = m.BuildPipeline(args[0]);
             if (!err.equals(RC.RC_SUCCESS))
                 System.out.println(err.info);
-
-
         }
     }
 }

@@ -3,9 +3,7 @@ import com.java_polytech.pipeline_interfaces.RC;
 
 import java.util.Arrays;
 
-enum WriterTokens{
 
-}
 
 public class WriterGrammar extends AbstractGrammar{
 

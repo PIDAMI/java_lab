@@ -6,9 +6,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
-enum ReaderTokens {
-    BUFFER_SIZE
-}
+
 
 public class ReaderGrammar extends AbstractGrammar{
 

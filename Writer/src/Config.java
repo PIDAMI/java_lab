@@ -1,6 +1,7 @@
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Scanner;
 
@@ -23,7 +24,9 @@ public class Config {
             while (scanner.hasNext()){
                 line = scanner.nextLine().trim();
                 numLines++;
-                String[] tokens = line.split(grammar.DEMILIMITER);
+                String[] tokens = Arrays.stream(line.split(grammar.DEMILIMITER))
+                        .map(String::trim)
+                        .toArray(String[]::new);
                 if (!grammar.isValidToken(tokens[0])){
                     System.out.println("Invalid config value at line " + numLines+ " :" + tokens[0]);
                     return grammar.getGrammarErrorCode();

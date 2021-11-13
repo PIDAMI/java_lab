@@ -43,5 +43,19 @@
         <SOURCES />
       </library>
     </orderEntry>
+    <orderEntry type="module-library">
+      <library>
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/libs/XXXwriter.jar!/" />
+          <root url="jar://$MODULE_DIR$/libs/XXXreader.jar!/" />
+          <root url="jar://$MODULE_DIR$/libs/XXXexecutor.jar!/" />
+          <root url="file://$MODULE_DIR$" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES>
+          <root url="file://$MODULE_DIR$/src" />
+        </SOURCES>
+      </library>
+    </orderEntry>
   </component>
 </module>

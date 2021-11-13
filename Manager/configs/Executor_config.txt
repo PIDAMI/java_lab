@@ -1,2 +1,0 @@
-ACTION=ENCODE
-TABLE_PATH=configs/substitution_table.txt
