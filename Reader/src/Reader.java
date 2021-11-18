@@ -1,10 +1,10 @@
-import java.io.*;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
-import java.util.Arrays;
-import java.util.HashMap;
+import com.java_polytech.pipeline_interfaces.IConsumer;
+import com.java_polytech.pipeline_interfaces.IReader;
+import com.java_polytech.pipeline_interfaces.RC;
 
-import com.java_polytech.pipeline_interfaces.*;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Arrays;
 
 public class Reader implements IReader{
 
@@ -40,10 +40,10 @@ public class Reader implements IReader{
         }
         try{
             int szBuffer = Integer.parseInt(this.cnfg
-                    .getParams()
-                    .get(ReaderTokens.BUFFER_SIZE.toString()));
+                    .get(ReaderGrammar.ReaderTokens.BUFFER_SIZE.toString()));
             if (szBuffer < 1)
                 return RC.RC_READER_CONFIG_SEMANTIC_ERROR;
+
             buffer = new byte[szBuffer];
         } catch (NumberFormatException e){
             return RC.RC_READER_CONFIG_SEMANTIC_ERROR;
@@ -66,8 +66,6 @@ public class Reader implements IReader{
     @Override
     public RC run() {
         int nonEmptyBufSize;
-        if (inputStream == null)
-            System.out.println("empty stream");
         do {
             try {
                 nonEmptyBufSize = inputStream.read(buffer, 0, buffer.length);
@@ -77,12 +75,11 @@ public class Reader implements IReader{
                 return RC.RC_READER_FAILED_TO_READ;
             }
             byte[] data = Arrays.copyOf(buffer, nonEmptyBufSize);
-            if (consumer == null)
-                System.out.println("empty consumer");
             RC err = consumer.consume(data);
             if (!err.equals(RC.RC_SUCCESS))
                 return err;
         } while (nonEmptyBufSize > 0);
+
         RC err = consumer.consume(null); // reached file's end
         if (!err.equals(RC.RC_SUCCESS))
             return err;

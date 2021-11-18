@@ -1,7 +1,6 @@
 
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.HashMap;
 
 import com.java_polytech.pipeline_interfaces.*;
 
@@ -48,6 +47,7 @@ public class Writer implements IWriter{
 
     private RC CloseStream(){
         RC err;
+        
         try {
             outputStream.close();
            err = RC.RC_SUCCESS;

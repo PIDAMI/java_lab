@@ -23,7 +23,8 @@ public class Config {
             while (scanner.hasNext()){
                 line = scanner.nextLine();
                 numLines++;
-                String[] tokens = Arrays.stream(line.split(grammar.DEMILIMITER))
+                String[] tokens = Arrays.stream(line
+                                .split(AbstractGrammar.DEMILIMITER))
                         .map(String::trim)
                         .toArray(String[]::new);
                 if (!grammar.isValidToken(tokens[0])){
@@ -46,5 +47,5 @@ public class Config {
 
 
 
-    public HashMap<String,String> getParams() { return this.params;}
+    public String get(String key) { return params.get(key);}
 }
