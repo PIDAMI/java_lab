@@ -5,6 +5,11 @@ import com.java_polytech.pipeline_interfaces.RC;
 public class Executor implements IExecutor {
 
 
+    public static void main(String[] args) {
+        Executor e = new Executor();
+        System.out.println(e.getClass().getName());
+    }
+
     public enum Action{
         ENCODE,
         DECODE

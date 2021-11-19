@@ -27,6 +27,8 @@ public class Config {
                                 .split(AbstractGrammar.DEMILIMITER))
                         .map(String::trim)
                         .toArray(String[]::new);
+                if (tokens.length != 2)
+                    return grammar.getGrammarErrorCode();
                 if (!grammar.isValidToken(tokens[0])){
                     System.out.println("Invalid config value at line " + numLines+ " :" + tokens[0]);
                     return grammar.getGrammarErrorCode();

@@ -1,4 +1,3 @@
-
 import com.java_polytech.pipeline_interfaces.RC;
 
 import java.util.Arrays;

@@ -106,21 +106,20 @@ public class Manager implements IConfigurable {
 
         Class<?> c = Class.forName(className);
         Constructor<?> cons = c.getConstructor();
-        Object object = cons.newInstance();
-        return (IConfigurable) object;
+        return (IConfigurable) cons.newInstance();
 
     }
 
     private RC setReader(){
 
-
         RC err = reader.setConfig(readerConfig);
         if (!err.equals(RC.RC_SUCCESS))
             return err;
-        err = reader.setInputStream(inputStream);
 
+        err = reader.setInputStream(inputStream);
         if (!err.equals(RC.RC_SUCCESS))
             return err;
+
         return reader.setConsumer(executor);
     }
 
@@ -152,7 +151,6 @@ public class Manager implements IConfigurable {
         } catch (ClassNotFoundException | NoSuchMethodException |
                 InvocationTargetException | InstantiationException |
                 IllegalAccessException e) {
-            e.printStackTrace();
             return RC_MANAGER_READER_NAME_ERROR;
         }
 

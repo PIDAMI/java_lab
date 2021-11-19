@@ -1,2 +1,2 @@
-ACTION=DECODE
-TABLE_PATH=configs/my_configs/substitution_table.txt
+ACTION = DECODE
+TABLE_PATH = configs/my_configs/substitution_table.txt

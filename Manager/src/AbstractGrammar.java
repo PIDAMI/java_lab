@@ -7,8 +7,6 @@ import java.util.List;
 public class AbstractGrammar {
 
     private final String[] tokens;
-    //    AbstractGrammar(String[] tokens){this.tokens=tokens;}
-//    String[] getTokens() {return this.tokens;}
     public final static String DEMILIMITER = "=";
 
 
@@ -24,9 +22,13 @@ public class AbstractGrammar {
         this.incompleteConfigError = incompleteConfigError;
     }
 
-    public boolean isValidToken(String val) {return Arrays.asList(tokens).contains(val);}
+    public boolean isValidToken(String val) {
+        return Arrays.asList(tokens).contains(val);
+    }
+
     public final int getNumTokens() {
-        return this.tokens == null ? 0 : this.tokens.length;
+        return this.tokens == null ?
+                0 : this.tokens.length;
     }
 
 
