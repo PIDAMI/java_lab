@@ -72,14 +72,18 @@ public class Manager implements IConfigurable {
                     break;
                 case INPUT_FILE:
                     try {
-                        this.inputStream = new FileInputStream(cnfg.get(token.toString()));
+                        this.inputStream = new FileInputStream(
+                                cnfg.get(token.toString())
+                        );
                     } catch (FileNotFoundException e) {
                         return RC.RC_MANAGER_INVALID_INPUT_FILE;
                     }
                     break;
                 case OUTPUT_FILE:
                     try {
-                        this.outputStream = new FileOutputStream(cnfg.get(token.toString()));
+                        this.outputStream = new FileOutputStream(
+                                cnfg.get(token.toString())
+                        );
                     } catch (FileNotFoundException e) {
                         return RC.RC_MANAGER_INVALID_OUTPUT_FILE;
                     }

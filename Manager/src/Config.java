@@ -25,12 +25,13 @@ public class Config {
                 numLines++;
                 String[] tokens = Arrays.stream(line
                                 .split(AbstractGrammar.DEMILIMITER))
-                        .map(String::trim)
-                        .toArray(String[]::new);
+                                .map(String::trim)
+                                .toArray(String[]::new);
                 if (tokens.length != 2)
                     return grammar.getGrammarErrorCode();
                 if (!grammar.isValidToken(tokens[0])){
-                    System.out.println("Invalid config value at line " + numLines+ " :" + tokens[0]);
+                    System.out.println("Invalid config value at line " +
+                            numLines+ " :" + tokens[0]);
                     return grammar.getGrammarErrorCode();
                 }
                 this.params.put(tokens[0],tokens[1]);

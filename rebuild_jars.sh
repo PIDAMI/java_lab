@@ -1,4 +1,6 @@
-cd ~/develop/SubstitutionTable
+#!/bin/bash
+
+#run script if some changes to jar's source are made
 rm -rf Manager/artefacts/*
 
 cd Executor
