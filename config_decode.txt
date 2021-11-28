@@ -1,5 +1,0 @@
-BUFFER_SIZE=100
-INPUT_FILE=temp.txt
-OUTPUT_FILE=decode.txt
-ACTION=DECODE
-TABLE_PATH=substitution_table.txt

@@ -1,5 +1,0 @@
-BUFFER_SIZE=100
-INPUT_FILE=message.txt
-OUTPUT_FILE=temp.txt
-ACTION=ENCODE
-TABLE_PATH=substitution_table.txt
