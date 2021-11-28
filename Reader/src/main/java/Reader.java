@@ -1,35 +1,50 @@
-import com.java_polytech.pipeline_interfaces.IConsumer;
-import com.java_polytech.pipeline_interfaces.IReader;
-import com.java_polytech.pipeline_interfaces.RC;
+import com.java_polytech.pipeline_interfaces.*;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
 
+
 public class Reader implements IReader{
+
+
+    private final static TYPE[] SUPPORTED_TYPES =
+            new TYPE[]{TYPE.CHAR_ARRAY, TYPE.BYTE_ARRAY, TYPE.INT_ARRAY};
+
 
     private InputStream inputStream;
     private byte[] buffer;
     private IConsumer consumer;
     private Config cnfg;
-    private final AbstractGrammar grammar = new ReaderGrammar();
-
+    private int nonEmptyBufSize;
+    private final BaseGrammar grammar = new ReaderGrammar();
 
     private final static RC RC_READER_CLOSE_STREAM_ERROR = new RC(RC.RCWho.READER,
             RC.RCType.CODE_CUSTOM_ERROR,
             "Reader couldn't close stream.");
 
 
-    private RC CloseStream(){
-        RC err;
-        try {
-            this.inputStream.close();
-            err = RC.RC_SUCCESS;
-        } catch (IOException e) {
-            err = RC_READER_CLOSE_STREAM_ERROR;
+    public class ByteMediator implements IMediator{
+        @Override
+        public Object getData() {
+            return Arrays.copyOf(buffer,nonEmptyBufSize);
         }
-        return err;
     }
+
+    public class IntMediator implements IMediator{
+        @Override
+        public Object getData() {
+            return Caster.bytesToInts(buffer,nonEmptyBufSize);
+        }
+    }
+
+    public class CharMediator implements IMediator{
+        @Override
+        public Object getData() {
+            return Caster.bytesToChars(buffer,nonEmptyBufSize);
+        }
+    }
+
 
     @Override
     public RC setConfig(String cnfg) {
@@ -58,6 +73,24 @@ public class Reader implements IReader{
     }
 
     @Override
+    public TYPE[] getOutputTypes() {
+        return Arrays.copyOf(SUPPORTED_TYPES, SUPPORTED_TYPES.length);
+    }
+
+
+
+    @Override
+    public IMediator getMediator(TYPE type) {
+        IMediator result = null;
+        switch (type){
+            case CHAR_ARRAY: result = new CharMediator(); break;
+            case BYTE_ARRAY: result = new ByteMediator(); break;
+            case INT_ARRAY: result = new IntMediator(); break;
+        }
+        return result;
+    }
+
+    @Override
     public RC setInputStream(InputStream inputStream) {
         this.inputStream = inputStream;
         return RC.RC_SUCCESS;
@@ -65,7 +98,6 @@ public class Reader implements IReader{
 
     @Override
     public RC run() {
-        int nonEmptyBufSize;
         do {
             try {
                 nonEmptyBufSize = inputStream.read(buffer, 0, buffer.length);
@@ -74,17 +106,15 @@ public class Reader implements IReader{
             } catch (IOException e) {
                 return RC.RC_READER_FAILED_TO_READ;
             }
-            byte[] data = Arrays.copyOf(buffer, nonEmptyBufSize);
-            RC err = consumer.consume(data);
+
+            RC err = consumer.consume();
             if (!err.equals(RC.RC_SUCCESS))
                 return err;
         } while (nonEmptyBufSize > 0);
 
-        RC err = consumer.consume(null); // reached file's end
-        if (!err.equals(RC.RC_SUCCESS))
-            return err;
-        err = CloseStream();
-        return err;
+//            if (!err.equals(RC.RC_SUCCESS))
+//            return err;
+        return consumer.consume();
     }
 
 

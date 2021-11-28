@@ -4,7 +4,7 @@ import java.util.Arrays;
 
 
 
-public class ExecutorGrammar extends AbstractGrammar{
+public class ExecutorGrammar extends BaseGrammar {
 
     public enum ExecutorTokens{
         TABLE_PATH,

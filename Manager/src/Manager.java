@@ -10,6 +10,16 @@ public class Manager implements IConfigurable {
 
 
 
+    private final static RC RC_MANAGER_CLOSE_OUTSTREAM_ERROR =  new RC(
+            RC.RCWho.MANAGER,
+            RC.RCType.CODE_CUSTOM_ERROR,
+            "Couldn't close output stream.");
+
+    private final static RC RC_MANAGER_CLOSE_INSTREAM_ERROR = new RC(
+            RC.RCWho.MANAGER,
+            RC.RCType.CODE_CUSTOM_ERROR,
+            "Couldn't close input stream.");
+
     private static final RC RC_MANAGER_READER_NAME_ERROR = new RC(
             RC.RCWho.MANAGER,
             RC.RCType.CODE_CUSTOM_ERROR,
@@ -144,6 +154,21 @@ public class Manager implements IConfigurable {
     }
 
 
+    public RC CloseStreams(){
+        RC err = RC.RC_SUCCESS;
+        try {
+            inputStream.close();
+        } catch (IOException e) {
+            err = RC_MANAGER_CLOSE_INSTREAM_ERROR;
+        }
+        try {
+            outputStream.close();
+        } catch (IOException e) {
+            err = RC_MANAGER_CLOSE_OUTSTREAM_ERROR;
+        }
+        return err;
+    }
+
     public RC BuildPipeline(String path) {
 
         RC err = setConfig(path);
@@ -191,7 +216,9 @@ public class Manager implements IConfigurable {
         if (!err.equals(RC.RC_SUCCESS))
             return err;
 
-        return reader.run();
+        err = reader.run();
+
+        return ;
     }
 
 }

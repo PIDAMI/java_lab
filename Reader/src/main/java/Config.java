@@ -6,15 +6,17 @@ import java.util.Scanner;
 
 import com.java_polytech.pipeline_interfaces.*;
 
+
 // syntax analyzer
 public class Config {
 
     private final HashMap<String, String> params = new HashMap<>();
-    private final AbstractGrammar grammar;
+    private final BaseGrammar grammar;
 
-    public Config(AbstractGrammar grammar){
+    public Config(BaseGrammar grammar){
         this.grammar = grammar;
     }
+
 
     public RC ParseConfig(String path){
         try (Scanner scanner = new Scanner(new File(path))){
@@ -24,9 +26,9 @@ public class Config {
                 line = scanner.nextLine();
                 numLines++;
                 String[] tokens = Arrays.stream(line
-                                .split(AbstractGrammar.DEMILIMITER))
-                        .map(String::trim)
-                        .toArray(String[]::new);
+                                .split(BaseGrammar.DEMILIMITER))
+                                .map(String::trim)
+                                .toArray(String[]::new);
                 if (tokens.length != 2)
                     return grammar.getGrammarErrorCode();
                 if (!grammar.isValidToken(tokens[0])){

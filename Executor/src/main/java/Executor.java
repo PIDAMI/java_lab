@@ -1,14 +1,37 @@
-import com.java_polytech.pipeline_interfaces.IConsumer;
-import com.java_polytech.pipeline_interfaces.IExecutor;
-import com.java_polytech.pipeline_interfaces.RC;
+import com.java_polytech.pipeline_interfaces.*;
+import com.sun.xml.internal.ws.policy.ComplexAssertion;
 
 public class Executor implements IExecutor {
 
 
-    public static void main(String[] args) {
-        Executor e = new Executor();
-        System.out.println(e.getClass().getName());
+    private final static TYPE[] SUPPORTED_TYPES = new TYPE[]{
+            TYPE.BYTE_ARRAY,
+            TYPE.CHAR_ARRAY };
+    private IMediator mediator;
+    private byte[] buffer;
+    private TYPE commonType;
+
+
+    private void convertFromCommonToByte(Object data){
+        if (commonType == TYPE.BYTE_ARRAY)
+            buffer = (byte[])data;
+        else
+            buffer = Caster.charsToBytes((char[]) data, ((char[])data).length);
     }
+
+
+    @Override
+    public RC setProvider(IProvider provider) {
+        commonType = (Caster.getCommonTypes(
+                provider.getOutputTypes(),
+                SUPPORTED_TYPES));
+        if (commonType == null){
+            return RC.RC_EXECUTOR_TYPES_INTERSECTION_EMPTY_ERROR;
+        }
+        mediator = provider.getMediator(commonType);
+        return RC.RC_SUCCESS;
+    }
+
 
     public enum Action{
         ENCODE,
@@ -25,7 +48,7 @@ public class Executor implements IExecutor {
     private Action action;
     private String tablePath;
     private final SubstitutionTable table = new SubstitutionTable();
-    private final AbstractGrammar grammar = new ExecutorGrammar();
+    private final BaseGrammar grammar = new ExecutorGrammar();
     private IConsumer consumer;
 
     @Override
@@ -56,21 +79,38 @@ public class Executor implements IExecutor {
     }
 
 
+
+
     @Override
-    public RC consume(byte[] bytes) {
-        if (bytes == null)
-            return consumer.consume(null);
-        byte[] result = new byte[bytes.length];
-        for (int i = 0; i < bytes.length; ++i){
-            result[i] = table.get(bytes[i]);
+    public RC consume() {
+        // only supported type is byte array,
+        // so we can explicitly convert to bytes
+        convertFromCommonToByte(mediator.getData());
+        if (buffer == null){
+
         }
-        return consumer.consume(result);
+
+        byte[] result = new byte[buffer.length];
+        for (int i = 0; i < buffer.length; ++i){
+            result[i] = table.get(buffer[i]);
+        }
+        return consumer.consume();
     }
 
     @Override
     public RC setConsumer(IConsumer iConsumer) {
         this.consumer = iConsumer;
         return RC.RC_SUCCESS;
+    }
+
+    @Override
+    public TYPE[] getOutputTypes() {
+        return new TYPE[0];
+    }
+
+    @Override
+    public IMediator getMediator(TYPE type) {
+        return null;
     }
 
 
