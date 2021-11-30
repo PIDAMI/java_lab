@@ -1,5 +1,8 @@
 import com.java_polytech.pipeline_interfaces.TYPE;
 
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
 import java.nio.IntBuffer;
@@ -22,10 +25,11 @@ public class Caster {
         }
         return res;
     }
-    
+
+
 
     public static int[] charsToInt(char[] chars, int nonEmptySize){
-        ByteBuffer byteBuffer = ByteBuffer.allocate(chars.length * Character.BYTES);
+        ByteBuffer byteBuffer = ByteBuffer.allocate(nonEmptySize * Character.BYTES);
         CharBuffer charBuffer = byteBuffer.asCharBuffer();
         charBuffer.put(chars);
         IntBuffer intBuf = byteBuffer.asIntBuffer();
@@ -39,7 +43,7 @@ public class Caster {
 
     public static char[] intsToChars(int[] ints, int nonEmptySize){
 
-        ByteBuffer byteBuffer = ByteBuffer.allocate(ints.length * Integer.BYTES);
+        ByteBuffer byteBuffer = ByteBuffer.allocate(nonEmptySize * Integer.BYTES);
         IntBuffer intBuffer = byteBuffer.asIntBuffer();
         intBuffer.put(ints);
         CharBuffer charBuf = byteBuffer.asCharBuffer();
@@ -51,12 +55,14 @@ public class Caster {
     }
 
     public static byte[] charsToBytes(char[] chars, int nonEmptySize) {
-        ByteBuffer byteBuffer = ByteBuffer.allocate(chars.length * Character.BYTES);
+        ByteBuffer byteBuffer = ByteBuffer.allocate(nonEmptySize * Character.BYTES);
         byteBuffer.asCharBuffer().put(chars);
         return byteBuffer.array();
     }
     public static char[] bytesToChars (byte[] bytes, int nonEmptySize) {
-        CharBuffer charBuffer = ByteBuffer.wrap(bytes).asCharBuffer();
+        CharBuffer charBuffer = ByteBuffer
+                .wrap(bytes,0,nonEmptySize)
+                .asCharBuffer();
         char[] result = new char[charBuffer.remaining()];
         charBuffer.get(result);
         return result;
@@ -64,15 +70,16 @@ public class Caster {
 
 
     public static int[] bytesToInts(byte[] bytes, int nonEmptySize){
-        IntBuffer intBuf =
-                ByteBuffer.wrap(bytes).asIntBuffer();
+        IntBuffer intBuf = ByteBuffer
+                .wrap(bytes,0,nonEmptySize)
+                .asIntBuffer();
         int[] result = new int[intBuf.remaining()];
         intBuf.get(result);
         return result;
     }
     public static byte[] intsToBytes(int[] ints, int nonEmptySize){
 
-        ByteBuffer byteBuffer = ByteBuffer.allocate(ints.length * Integer.BYTES);
+        ByteBuffer byteBuffer = ByteBuffer.allocate(nonEmptySize * Integer.BYTES);
         byteBuffer.asIntBuffer().put(ints);
         return byteBuffer.array();
     }

@@ -8,14 +8,48 @@ public class Writer implements IWriter{
 
 
 
+    private final static TYPE[] SUPPORTED_TYPES =
+            new TYPE[]{TYPE.CHAR_ARRAY, TYPE.BYTE_ARRAY, TYPE.INT_ARRAY};
+
+//    private IProvider provider;
+    private TYPE commonType;
+    private IMediator executorMediator;
     private OutputStream outputStream;
     private Config cnfg;
-    private final AbstractGrammar grammar = new WriterGrammar();
+    private final BaseGrammar grammar = new WriterGrammar();
 
-    private final static RC RC_WRITER_CLOSE_STREAM_ERROR =  new RC(
-            RC.RCWho.WRITER,
-            RC.RCType.CODE_CUSTOM_ERROR,
-            "Writer couldn't close stream.");
+//    private final static RC RC_WRITER_CLOSE_STREAM_ERROR =  new RC(
+//            RC.RCWho.WRITER,
+//            RC.RCType.CODE_CUSTOM_ERROR,
+//            "Writer couldn't close stream.");
+
+
+
+
+    private byte[] convertFromCommonToByte(Object data){
+        byte[] res = null;
+        if (commonType == TYPE.BYTE_ARRAY)
+            res = (byte[])data;
+        else if (commonType == TYPE.CHAR_ARRAY)
+            res = Caster.charsToBytes((char[]) data,
+                    ((char[])data).length);
+        else
+            res = Caster.intsToBytes((int[]) data,
+                    ((int[])data).length);
+        return res;
+    }
+
+    @Override
+    public RC setProvider(IProvider provider) {
+        commonType = (Caster.getCommonTypes(
+                provider.getOutputTypes(),
+                SUPPORTED_TYPES));
+        if (commonType == null){
+            return RC.RC_WRITER_TYPES_INTERSECTION_EMPTY_ERROR;
+        }
+        executorMediator = provider.getMediator(commonType);
+        return RC.RC_SUCCESS;
+    }
 
     @Override
     public RC setOutputStream(OutputStream outputStream) {
@@ -33,29 +67,36 @@ public class Writer implements IWriter{
     }
 
     @Override
-    public RC consume(byte[] bytes) {
-        if (bytes == null)
-            return CloseStream();
-        try {
-            outputStream.write(bytes);
-        } catch (IOException e) {
-            return RC.RC_WRITER_FAILED_TO_WRITE;
+    public RC consume() {
+
+        byte[] toWrite = convertFromCommonToByte(
+                executorMediator.getData()
+        );
+
+        if (toWrite != null){
+            try {
+                outputStream.write(toWrite,0,toWrite.length);
+            } catch (IOException e) {
+                return RC.RC_WRITER_FAILED_TO_WRITE;
+            }
         }
 
         return RC.RC_SUCCESS;
     }
 
-    private RC CloseStream(){
-        RC err;
-        
-        try {
-            outputStream.close();
-           err = RC.RC_SUCCESS;
-        } catch (IOException e) {
-            err = RC_WRITER_CLOSE_STREAM_ERROR;
-        }
-        return err;
-    }
+
+
+//    private RC CloseStream(){
+//        RC err;
+//
+//        try {
+//            outputStream.close();
+//           err = RC.RC_SUCCESS;
+//        } catch (IOException e) {
+//            err = RC_WRITER_CLOSE_STREAM_ERROR;
+//        }
+//        return err;
+//    }
 
 
 
