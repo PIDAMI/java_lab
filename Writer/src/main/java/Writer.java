@@ -1,4 +1,3 @@
-
 import java.io.IOException;
 import java.io.OutputStream;
 
@@ -11,22 +10,18 @@ public class Writer implements IWriter{
     private final static TYPE[] SUPPORTED_TYPES =
             new TYPE[]{TYPE.CHAR_ARRAY, TYPE.BYTE_ARRAY, TYPE.INT_ARRAY};
 
-//    private IProvider provider;
     private TYPE commonType;
     private IMediator executorMediator;
     private OutputStream outputStream;
     private Config cnfg;
     private final BaseGrammar grammar = new WriterGrammar();
 
-//    private final static RC RC_WRITER_CLOSE_STREAM_ERROR =  new RC(
-//            RC.RCWho.WRITER,
-//            RC.RCType.CODE_CUSTOM_ERROR,
-//            "Writer couldn't close stream.");
-
-
 
 
     private byte[] convertFromCommonToByte(Object data){
+        if (data == null)
+            return null;
+
         byte[] res = null;
         if (commonType == TYPE.BYTE_ARRAY)
             res = (byte[])data;

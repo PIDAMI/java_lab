@@ -1,22 +1,27 @@
 import com.java_polytech.pipeline_interfaces.*;
-import com.sun.xml.internal.ws.policy.ComplexAssertion;
+
+import java.util.Arrays;
 
 public class Executor implements IExecutor {
-
 
     private final static TYPE[] SUPPORTED_TYPES = new TYPE[]{
             TYPE.BYTE_ARRAY,
             TYPE.CHAR_ARRAY };
-    private IMediator mediator;
+    private IMediator readerMediator;
     private byte[] buffer;
     private TYPE commonType;
 
 
-    private void convertFromCommonToByte(Object data){
+    private byte[] convertFromCommonToByte(Object data){
+        if (data == null)
+            return null;
+        byte[] res = null;
         if (commonType == TYPE.BYTE_ARRAY)
-            buffer = (byte[])data;
+            res = (byte[])data;
         else
-            buffer = Caster.charsToBytes((char[]) data, ((char[])data).length);
+            res = Caster.charsToBytes((char[]) data,
+                    ((char[])data).length);
+        return res;
     }
 
 
@@ -28,7 +33,7 @@ public class Executor implements IExecutor {
         if (commonType == null){
             return RC.RC_EXECUTOR_TYPES_INTERSECTION_EMPTY_ERROR;
         }
-        mediator = provider.getMediator(commonType);
+        readerMediator = provider.getMediator(commonType);
         return RC.RC_SUCCESS;
     }
 
@@ -85,14 +90,11 @@ public class Executor implements IExecutor {
     public RC consume() {
         // only supported type is byte array,
         // so we can explicitly convert to bytes
-        convertFromCommonToByte(mediator.getData());
-        if (buffer == null){
-
-        }
-
-        byte[] result = new byte[buffer.length];
-        for (int i = 0; i < buffer.length; ++i){
-            result[i] = table.get(buffer[i]);
+        buffer = convertFromCommonToByte(readerMediator.getData());
+        if (buffer != null){
+            for (int i = 0; i < buffer.length; ++i){
+                buffer[i] = table.get(buffer[i]);
+            }
         }
         return consumer.consume();
     }
@@ -105,12 +107,34 @@ public class Executor implements IExecutor {
 
     @Override
     public TYPE[] getOutputTypes() {
-        return new TYPE[0];
+        return Arrays.copyOf(SUPPORTED_TYPES,SUPPORTED_TYPES.length);
     }
+
+    public class ByteMediator implements IMediator{
+        @Override
+        public Object getData() {
+            if (buffer == null)
+                return null;
+            return Arrays.copyOf(buffer,buffer.length);
+        }
+    }
+
+    public class CharMediator implements IMediator{
+        @Override
+        public Object getData() {
+            return Caster.bytesToChars(buffer,buffer.length);
+        }
+    }
+
 
     @Override
     public IMediator getMediator(TYPE type) {
-        return null;
+        IMediator result = null;
+        switch (type){
+            case CHAR_ARRAY: result = new CharMediator(); break;
+            case BYTE_ARRAY: result = new ByteMediator(); break;
+        }
+        return result;
     }
 
 

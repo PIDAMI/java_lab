@@ -10,9 +10,9 @@ import com.java_polytech.pipeline_interfaces.*;
 public class Config {
 
     private final HashMap<String, String> params = new HashMap<>();
-    private final AbstractGrammar grammar;
+    private final BaseGrammar grammar;
 
-    public Config(AbstractGrammar grammar){
+    public Config(BaseGrammar grammar){
         this.grammar = grammar;
     }
 
@@ -24,7 +24,7 @@ public class Config {
                 line = scanner.nextLine();
                 numLines++;
                 String[] tokens = Arrays.stream(line
-                                .split(AbstractGrammar.DEMILIMITER))
+                                .split(BaseGrammar.DEMILIMITER))
                                 .map(String::trim)
                                 .toArray(String[]::new);
                 if (tokens.length != 2)

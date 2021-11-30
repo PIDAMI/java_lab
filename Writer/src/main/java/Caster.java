@@ -1,14 +1,8 @@
 import com.java_polytech.pipeline_interfaces.TYPE;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
 import java.nio.IntBuffer;
-import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
-import java.util.stream.IntStream;
 
 public class Caster {
 
@@ -77,6 +71,7 @@ public class Caster {
         intBuf.get(result);
         return result;
     }
+
     public static byte[] intsToBytes(int[] ints, int nonEmptySize){
 
         ByteBuffer byteBuffer = ByteBuffer.allocate(nonEmptySize * Integer.BYTES);

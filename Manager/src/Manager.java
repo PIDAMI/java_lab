@@ -3,9 +3,11 @@ import com.java_polytech.pipeline_interfaces.*;
 import java.io.*;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
-import java.util.HashMap;
 
 public class Manager implements IConfigurable {
+
+
+
 
 
 
@@ -41,6 +43,7 @@ public class Manager implements IConfigurable {
     );
 
 
+
     private OutputStream outputStream;
     private InputStream inputStream;
     private String readerConfig;
@@ -55,7 +58,7 @@ public class Manager implements IConfigurable {
     private IExecutor executor;
     private IWriter writer;
 
-    private AbstractGrammar grammar = new ManagerGrammar();
+    private BaseGrammar grammar = new ManagerGrammar();
 
 
     @Override
@@ -134,23 +137,33 @@ public class Manager implements IConfigurable {
         if (!err.equals(RC.RC_SUCCESS))
             return err;
 
+
+
         return reader.setConsumer(executor);
     }
 
     private RC setWriter(){
 
-        RC err = this.writer.setConfig(this.writerConfig);
+        RC err = writer.setConfig(writerConfig);
         if (!err.equals(RC.RC_SUCCESS))
             return err;
-        return this.writer.setOutputStream(this.outputStream);
+        err = writer.setOutputStream(outputStream);
+        if (!err.equals(RC.RC_SUCCESS))
+            return err;
+        return writer.setProvider(executor);
     }
 
     private RC setExecutor(){
 
-        RC err = this.executor.setConfig(this.executorConfig);
+        RC err = executor.setConfig(executorConfig);
         if (!err.equals(RC.RC_SUCCESS))
             return err;
-        return this.executor.setConsumer(this.writer);
+
+        err = executor.setConsumer(writer);
+        if (!err.equals(RC.RC_SUCCESS))
+            return err;
+
+        return executor.setProvider(reader);
     }
 
 
@@ -218,7 +231,7 @@ public class Manager implements IConfigurable {
 
         err = reader.run();
 
-        return ;
+        return err;
     }
 
 }

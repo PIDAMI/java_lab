@@ -3,7 +3,7 @@ import com.java_polytech.pipeline_interfaces.RC;
 import java.util.Arrays;
 
 
-public class ManagerGrammar extends AbstractGrammar {
+public class ManagerGrammar extends BaseGrammar {
 
 
     public enum ManagerTokens {

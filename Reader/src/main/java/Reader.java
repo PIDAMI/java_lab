@@ -27,12 +27,16 @@ public class Reader implements IReader{
     public class ByteMediator implements IMediator{
         @Override
         public Object getData() {
-            return Arrays.copyOf(buffer,nonEmptyBufSize);
+            if (nonEmptyBufSize < 0)
+                return null;
+            else
+                return Arrays.copyOf(buffer,nonEmptyBufSize);
         }
     }
 
     public class IntMediator implements IMediator{
         @Override
+
         public Object getData() {
             return Caster.bytesToInts(buffer,nonEmptyBufSize);
         }
