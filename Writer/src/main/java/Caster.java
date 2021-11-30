@@ -6,7 +6,6 @@ import java.nio.IntBuffer;
 
 public class Caster {
 
-
     public static TYPE getCommonTypes(TYPE[] o1, TYPE[] o2){
         TYPE res = null;
         for (TYPE firstType: o1){
@@ -23,6 +22,8 @@ public class Caster {
 
 
     public static int[] charsToInt(char[] chars, int nonEmptySize){
+//        if (chars == null || nonEmptySize < 0)
+//            return null;
         ByteBuffer byteBuffer = ByteBuffer.allocate(nonEmptySize * Character.BYTES);
         CharBuffer charBuffer = byteBuffer.asCharBuffer();
         charBuffer.put(chars);
@@ -36,6 +37,8 @@ public class Caster {
 
 
     public static char[] intsToChars(int[] ints, int nonEmptySize){
+//        if (ints == null || nonEmptySize < 0)
+//            return null;
 
         ByteBuffer byteBuffer = ByteBuffer.allocate(nonEmptySize * Integer.BYTES);
         IntBuffer intBuffer = byteBuffer.asIntBuffer();
@@ -44,16 +47,21 @@ public class Caster {
         char[] result = new char[charBuf.remaining()];
         charBuf.get(result);
 
-
         return result;
     }
 
     public static byte[] charsToBytes(char[] chars, int nonEmptySize) {
+//        if (chars == null || nonEmptySize < 0)
+//            return null;
         ByteBuffer byteBuffer = ByteBuffer.allocate(nonEmptySize * Character.BYTES);
         byteBuffer.asCharBuffer().put(chars);
         return byteBuffer.array();
     }
+
+
     public static char[] bytesToChars (byte[] bytes, int nonEmptySize) {
+//        if (bytes == null || nonEmptySize < 0)
+//            return null;
         CharBuffer charBuffer = ByteBuffer
                 .wrap(bytes,0,nonEmptySize)
                 .asCharBuffer();
@@ -64,6 +72,9 @@ public class Caster {
 
 
     public static int[] bytesToInts(byte[] bytes, int nonEmptySize){
+//        if (bytes == null || nonEmptySize < 0)
+//            return null;
+
         IntBuffer intBuf = ByteBuffer
                 .wrap(bytes,0,nonEmptySize)
                 .asIntBuffer();
@@ -73,6 +84,8 @@ public class Caster {
     }
 
     public static byte[] intsToBytes(int[] ints, int nonEmptySize){
+//        if (ints == null || nonEmptySize < 0)
+//            return null;
 
         ByteBuffer byteBuffer = ByteBuffer.allocate(nonEmptySize * Integer.BYTES);
         byteBuffer.asIntBuffer().put(ints);

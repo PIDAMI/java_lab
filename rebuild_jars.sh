@@ -18,3 +18,6 @@ mvn clean
 mvn package
 cp target/Reader-1.0-SNAPSHOT.jar ../Manager/artefacts/reader.jar
 
+cd ../Manager
+rm executor.jar reader.jar writer.jar
+cp artefacts/* libs/

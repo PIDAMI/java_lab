@@ -27,6 +27,7 @@ public class Reader implements IReader{
     public class ByteMediator implements IMediator{
         @Override
         public Object getData() {
+            // means reached file's end
             if (nonEmptyBufSize < 0)
                 return null;
             else
@@ -36,8 +37,10 @@ public class Reader implements IReader{
 
     public class IntMediator implements IMediator{
         @Override
-
         public Object getData() {
+            // means reached file's end
+            if (nonEmptyBufSize < 0)
+                return null;
             return Caster.bytesToInts(buffer,nonEmptyBufSize);
         }
     }
@@ -45,6 +48,9 @@ public class Reader implements IReader{
     public class CharMediator implements IMediator{
         @Override
         public Object getData() {
+            // means reached file's end
+            if (nonEmptyBufSize < 0)
+                return null;
             return Caster.bytesToChars(buffer,nonEmptyBufSize);
         }
     }

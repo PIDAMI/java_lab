@@ -122,6 +122,8 @@ public class Executor implements IExecutor {
     public class CharMediator implements IMediator{
         @Override
         public Object getData() {
+            if (buffer == null)
+                return null;
             return Caster.bytesToChars(buffer,buffer.length);
         }
     }
