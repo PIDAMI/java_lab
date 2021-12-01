@@ -3,6 +3,7 @@ import com.java_polytech.pipeline_interfaces.*;
 import java.io.*;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.util.logging.*;
 
 public class Manager implements IConfigurable {
 
@@ -43,9 +44,11 @@ public class Manager implements IConfigurable {
     );
 
 
+    private final MyLogger logger;
 
     private OutputStream outputStream;
     private InputStream inputStream;
+
     private String readerConfig;
     private String executorConfig;
     private String writerConfig;
@@ -60,9 +63,14 @@ public class Manager implements IConfigurable {
 
     private BaseGrammar grammar = new ManagerGrammar();
 
+    public Manager(MyLogger logger){
+        this.logger = logger;
+    }
+
 
     @Override
     public RC setConfig(String path) {
+
         Config cnfg = new Config(grammar);
         RC err = cnfg.ParseConfig(path);
         if (err != RC.RC_SUCCESS){
