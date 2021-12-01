@@ -31,8 +31,11 @@ public class Config {
                 if (!grammar.isValidToken(tokens[0])){
                     return grammar.getGrammarErrorCode();
                 }
-                this.params.put(tokens[0],
-                        tokens[1].split(BaseGrammar.TOKEN_VALUE_DELIMITER));
+                String[] tokenValues = Arrays
+                        .stream(tokens[1].split(BaseGrammar.TOKEN_VALUE_DELIMITER))
+                        .map(String::trim)
+                        .toArray(String[]::new);
+                this.params.put(tokens[0],tokenValues);
             }
 
             if (this.params.size() != grammar.getNumTokens()){

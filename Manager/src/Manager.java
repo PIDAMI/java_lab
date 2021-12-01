@@ -214,7 +214,7 @@ public class Manager implements IConfigurable {
         if (!err.equals(RC.RC_SUCCESS))
             return err;
 
-        logger.info("creating pipeline components...");
+        logger.info("Creating pipeline components...");
         try {
             reader = (IReader) createConfigurable(readerName);
         } catch (ClassNotFoundException | NoSuchMethodException |
@@ -265,10 +265,10 @@ public class Manager implements IConfigurable {
         if (!err.equals(RC.RC_SUCCESS))
             return err;
 
-        logger.info("starting processing...");
+        logger.info("Starting processing...");
         err = reader.run();
         if (err == RC.RC_SUCCESS)
-            logger.info("successfully finished processing");
+            logger.info("Successfully finished processing");
 
         return err;
     }

@@ -24,6 +24,7 @@ public class Main {
                     logger.severe(err.info);
                     System.out.println(err.info);
                 }
+                System.out.println("Successfully finished processing");
 
             } catch (IOException e) {
                 System.out.println("Can't open log file");
