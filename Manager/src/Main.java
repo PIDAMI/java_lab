@@ -20,10 +20,13 @@ public class Main {
                 MyLogger logger = new MyLogger();
                 Manager m = new Manager(logger);
                 RC err = m.BuildPipeline(args[0]);
-                if (!err.equals(RC.RC_SUCCESS))
+                if (!err.equals(RC.RC_SUCCESS)){
+                    logger.severe(err.info);
                     System.out.println(err.info);
+                }
+
             } catch (IOException e) {
-                System.out.println("can't open log file");
+                System.out.println("Can't open log file");
             }
         }
     }

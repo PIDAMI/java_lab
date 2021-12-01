@@ -7,8 +7,7 @@ import java.util.Arrays;
 public class ExecutorGrammar extends BaseGrammar {
 
     public enum ExecutorTokens{
-        TABLE_PATH,
-        ACTION
+        TABLE_PATH
     }
     private final static RC RC_EXECUTOR_INCOMPLETE_CONFIG_ERROR = new RC(RC.RCWho.EXECUTOR,
             RC.RCType.CODE_CUSTOM_ERROR,

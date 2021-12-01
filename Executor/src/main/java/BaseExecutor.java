@@ -2,7 +2,7 @@ import com.java_polytech.pipeline_interfaces.*;
 
 import java.util.Arrays;
 
-public class Executor implements IExecutor {
+public class BaseExecutor implements IExecutor {
 
     private final static TYPE[] SUPPORTED_TYPES = new TYPE[]{
             TYPE.BYTE_ARRAY,
@@ -24,6 +24,9 @@ public class Executor implements IExecutor {
         return res;
     }
 
+    protected BaseExecutor(Action action){
+        this.action = action;
+    }
 
     @Override
     public RC setProvider(IProvider provider) {
@@ -38,19 +41,21 @@ public class Executor implements IExecutor {
     }
 
 
+
     public enum Action{
-        ENCODE,
-        DECODE
+        ENCODE(0,1),
+        DECODE(1,0);
+
+        public final int keyIndex;
+        public final int valIndex;
+        Action(int keyIndex, int valIndex){
+            this.keyIndex = keyIndex;
+            this.valIndex = valIndex;
+        }
     }
 
-
-    private final static RC RC_INVALID_ACTION = new RC(RC.RCWho.EXECUTOR,
-            RC.RCType.CODE_CUSTOM_ERROR,
-            "Invalid executor's action - can only be ENCODE or DECODE");
-
-
+    private final Action action;
     private Config cnfg;
-    private Action action;
     private String tablePath;
     private final SubstitutionTable table = new SubstitutionTable();
     private final BaseGrammar grammar = new ExecutorGrammar();
@@ -67,17 +72,11 @@ public class Executor implements IExecutor {
         // it's guaranteed config has all token values and nothing else
         for (ExecutorGrammar.ExecutorTokens token:
                 ExecutorGrammar.ExecutorTokens.values()){
-            switch (token){
-                case ACTION:
-                    try{
-                        action = Action.valueOf(cnfg.get(token.toString()));
-                    } catch (IllegalArgumentException e){
-                        return RC_INVALID_ACTION;
-                    }
-                    break;
-                case TABLE_PATH:
-                    tablePath = cnfg.get(token.toString());
-                    break;
+            if (token == ExecutorGrammar.ExecutorTokens.TABLE_PATH) {
+                String[] tablePathParams = cnfg.get(token.toString());
+                if (tablePathParams == null || tablePathParams.length != 1)
+                    return RC.RC_EXECUTOR_CONFIG_GRAMMAR_ERROR;
+                tablePath = tablePathParams[0];
             }
         }
         return table.loadTable(action,tablePath);

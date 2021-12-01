@@ -7,8 +7,10 @@ import java.util.List;
 public class BaseGrammar {
 
     private final String[] tokens;
+    // for splitting token(key) and its value
     public final static String DEMILIMITER = "=";
-
+    // for splitting token's value (for executor names, executor configs)
+    public final static String TOKEN_VALUE_DELIMITER = ",";
 
     private final RC grammarError;
     private final RC noFileError;

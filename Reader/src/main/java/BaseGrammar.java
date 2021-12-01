@@ -1,14 +1,17 @@
-
-import com.java_polytech.pipeline_interfaces.RC;
+import com.java_polytech.pipeline_interfaces.*;
 
 import java.util.Arrays;
+import java.util.List;
 
 
 public class BaseGrammar {
 
-    private final String[] tokens;
-    public final static String DEMILIMITER = "=";
 
+    private final String[] tokens;
+    // for splitting token(key) and its value
+    public final static String DEMILIMITER = "=";
+    // for splitting token's value (for executor names, executor configs)
+    public final static String TOKEN_VALUE_DELIMITER = ",";
 
     private final RC grammarError;
     private final RC noFileError;
@@ -22,9 +25,13 @@ public class BaseGrammar {
         this.incompleteConfigError = incompleteConfigError;
     }
 
-    public boolean isValidToken(String val) {return Arrays.asList(tokens).contains(val);}
+    public boolean isValidToken(String val) {
+        return Arrays.asList(tokens).contains(val);
+    }
+
     public final int getNumTokens() {
-        return this.tokens == null ? 0 : this.tokens.length;
+        return this.tokens == null ?
+                0 : this.tokens.length;
     }
 
 

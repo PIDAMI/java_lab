@@ -62,18 +62,7 @@ public class SubstitutionTable {
     }
 
 
-    public RC loadTable(Executor.Action action, String tablePath) {
-
-
-        int keyIndex;
-        int valIndex;
-        if (action == Executor.Action.ENCODE){
-            keyIndex = 0;
-            valIndex = 1;
-        } else {
-            keyIndex = 1;
-            valIndex = 0;
-        }
+    public RC loadTable(BaseExecutor.Action action, String tablePath) {
 
 
         try (Scanner scanner = new Scanner(new File(tablePath))) {
@@ -86,8 +75,8 @@ public class SubstitutionTable {
                 if (!err.equals(RC.RC_SUCCESS))
                     return err;
 
-                byte key = Byte.parseByte(tokens[keyIndex]);
-                byte val = Byte.parseByte(tokens[valIndex]);
+                byte key = Byte.parseByte(tokens[action.keyIndex]);
+                byte val = Byte.parseByte(tokens[action.valIndex]);
                 this.table.put(key,val);
 
             }
