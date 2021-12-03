@@ -4,15 +4,16 @@ import com.java_polytech.pipeline_interfaces.RC;
 
 public class Executor implements IExecutor {
 
-
-    public static void main(String[] args) {
-        Executor e = new Executor();
-        System.out.println(e.getClass().getName());
-    }
-
     public enum Action{
-        ENCODE,
-        DECODE
+        ENCODE(0,1),
+        DECODE(1,0);
+
+        public final int keyIndex;
+        public final int valIndex;
+        Action(int keyIndex, int valIndex){
+            this.keyIndex = keyIndex;
+            this.valIndex = valIndex;
+        }
     }
 
 
@@ -25,7 +26,7 @@ public class Executor implements IExecutor {
     private Action action;
     private String tablePath;
     private final SubstitutionTable table = new SubstitutionTable();
-    private final AbstractGrammar grammar = new ExecutorGrammar();
+    private final BaseGrammar grammar = new ExecutorGrammar();
     private IConsumer consumer;
 
     @Override
