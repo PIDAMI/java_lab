@@ -4,29 +4,33 @@ import java.util.Arrays;
 import java.util.List;
 
 
-public class AbstractGrammar {
+public class BaseGrammar {
 
     private final String[] tokens;
-    //    AbstractGrammar(String[] tokens){this.tokens=tokens;}
-//    String[] getTokens() {return this.tokens;}
+    // for splitting token(key) and its value
     public final static String DEMILIMITER = "=";
-
+    // for splitting token's value (for executor names, executor configs)
+    public final static String TOKEN_VALUE_DELIMITER = ",";
 
     private final RC grammarError;
     private final RC noFileError;
     private final RC incompleteConfigError;
 
-    protected AbstractGrammar(String[] tokens, RC grammarError,
-                              RC noFileError, RC incompleteConfigError) {
+    protected BaseGrammar(String[] tokens, RC grammarError,
+                          RC noFileError, RC incompleteConfigError) {
         this.tokens = tokens;
         this.grammarError = grammarError;
         this.noFileError = noFileError;
         this.incompleteConfigError = incompleteConfigError;
     }
 
-    public boolean isValidToken(String val) {return Arrays.asList(tokens).contains(val);}
+    public boolean isValidToken(String val) {
+        return Arrays.asList(tokens).contains(val);
+    }
+
     public final int getNumTokens() {
-        return this.tokens == null ? 0 : this.tokens.length;
+        return this.tokens == null ?
+                0 : this.tokens.length;
     }
 
 

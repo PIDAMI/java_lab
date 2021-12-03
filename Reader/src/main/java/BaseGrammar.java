@@ -4,18 +4,21 @@ import java.util.Arrays;
 import java.util.List;
 
 
-public class AbstractGrammar {
+public class BaseGrammar {
+
 
     private final String[] tokens;
+    // for splitting token(key) and its value
     public final static String DEMILIMITER = "=";
-
+    // for splitting token's value (for executor names, executor configs)
+    public final static String TOKEN_VALUE_DELIMITER = ",";
 
     private final RC grammarError;
     private final RC noFileError;
     private final RC incompleteConfigError;
 
-    protected AbstractGrammar(String[] tokens, RC grammarError,
-                              RC noFileError, RC incompleteConfigError) {
+    protected BaseGrammar(String[] tokens, RC grammarError,
+                          RC noFileError, RC incompleteConfigError) {
         this.tokens = tokens;
         this.grammarError = grammarError;
         this.noFileError = noFileError;
