@@ -51,7 +51,6 @@ public class Manager implements IConfigurable {
     private IExecutor[] executors;
     private IWriter writer;
 
-//    private String[] orderedExecutors;
 
     private BaseGrammar grammar = new ManagerGrammar();
 
@@ -144,9 +143,10 @@ public class Manager implements IConfigurable {
         if (!err.equals(RC.RC_SUCCESS))
             return err;
 
+        reader.setConsumer(executors[0]);
+        return err;
+//        return reader.setConsumer(executors[0]);
 
-
-        return reader.setConsumer(executors[0]);
     }
 
     private RC setWriter(){
@@ -157,7 +157,8 @@ public class Manager implements IConfigurable {
         err = writer.setOutputStream(outputStream);
         if (!err.equals(RC.RC_SUCCESS))
             return err;
-        return writer.setProvider(executors[executors.length-1]);
+//        return writer.setProvider(executors[executors.length-1]);
+        return err;
     }
 
     private RC setExecutors(){
@@ -179,13 +180,13 @@ public class Manager implements IConfigurable {
             if (!err.equals(RC.RC_SUCCESS))
                 return err;
 
-            if (i == 0)
-                err = executors[i].setProvider(reader);
-            else
-                err = executors[i].setProvider(executors[i-1]);
-
-            if (!err.equals(RC.RC_SUCCESS))
-                return err;
+//            if (i == 0)
+//                err = executors[i].setProvider(reader);
+//            else
+//                err = executors[i].setProvider(executors[i-1]);
+//
+//            if (!err.equals(RC.RC_SUCCESS))
+//                return err;
         }
 
 

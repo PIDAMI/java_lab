@@ -80,19 +80,4 @@ public class Writer implements IWriter{
     }
 
 
-
-//    private RC CloseStream(){
-//        RC err;
-//
-//        try {
-//            outputStream.close();
-//           err = RC.RC_SUCCESS;
-//        } catch (IOException e) {
-//            err = RC_WRITER_CLOSE_STREAM_ERROR;
-//        }
-//        return err;
-//    }
-
-
-
 }

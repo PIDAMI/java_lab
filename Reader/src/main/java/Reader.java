@@ -83,7 +83,7 @@ public class Reader implements IReader{
     @Override
     public RC setConsumer(IConsumer consumer) {
         this.consumer = consumer;
-        return RC.RC_SUCCESS;
+        return this.consumer.setProvider(this);
     }
 
     @Override
@@ -120,6 +120,8 @@ public class Reader implements IReader{
                 return RC.RC_READER_FAILED_TO_READ;
             }
 
+            if (consumer == null)
+                System.out.println("NULL CONSUMER IN READER");
             RC err = consumer.consume();
             if (!err.equals(RC.RC_SUCCESS))
                 return err;

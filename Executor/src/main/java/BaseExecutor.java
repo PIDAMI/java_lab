@@ -72,12 +72,14 @@ public class BaseExecutor implements IExecutor {
         // it's guaranteed config has all token values and nothing else
         for (ExecutorGrammar.ExecutorTokens token:
                 ExecutorGrammar.ExecutorTokens.values()){
+
             if (token == ExecutorGrammar.ExecutorTokens.TABLE_PATH) {
                 String[] tablePathParams = cnfg.get(token.toString());
                 if (tablePathParams == null || tablePathParams.length != 1)
                     return RC.RC_EXECUTOR_CONFIG_GRAMMAR_ERROR;
                 tablePath = tablePathParams[0];
             }
+
         }
         return table.loadTable(action,tablePath);
     }
@@ -87,8 +89,6 @@ public class BaseExecutor implements IExecutor {
 
     @Override
     public RC consume() {
-        // only supported type is byte array,
-        // so we can explicitly convert to bytes
         buffer = convertFromCommonToByte(readerMediator.getData());
         if (buffer != null){
             for (int i = 0; i < buffer.length; ++i){
@@ -101,7 +101,7 @@ public class BaseExecutor implements IExecutor {
     @Override
     public RC setConsumer(IConsumer iConsumer) {
         this.consumer = iConsumer;
-        return RC.RC_SUCCESS;
+        return this.consumer.setProvider(this);
     }
 
     @Override
