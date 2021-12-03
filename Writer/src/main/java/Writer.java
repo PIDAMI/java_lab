@@ -9,14 +9,12 @@ public class Writer implements IWriter{
 
     private final static TYPE[] SUPPORTED_TYPES =
             new TYPE[]{TYPE.CHAR_ARRAY, TYPE.BYTE_ARRAY, TYPE.INT_ARRAY};
-
     private TYPE commonType;
+
     private IMediator executorMediator;
     private OutputStream outputStream;
     private Config cnfg;
     private final BaseGrammar grammar = new WriterGrammar();
-
-
 
     private byte[] convertFromCommonToByte(Object data){
         if (data == null)
@@ -63,11 +61,9 @@ public class Writer implements IWriter{
 
     @Override
     public RC consume() {
-
         byte[] toWrite = convertFromCommonToByte(
                 executorMediator.getData()
         );
-
         if (toWrite != null){
             try {
                 outputStream.write(toWrite,0,toWrite.length);
@@ -75,7 +71,6 @@ public class Writer implements IWriter{
                 return RC.RC_WRITER_FAILED_TO_WRITE;
             }
         }
-
         return RC.RC_SUCCESS;
     }
 

@@ -1,8 +1,8 @@
-INPUT_FILE=message.txt
-OUTPUT_FILE=tmp.txt
+INPUT_FILE=output.txt
+OUTPUT_FILE=decoded.txt
 READER_NAME=Reader
 WRITER_NAME=com.java_polytech.pipeline.Writer
-EXECUTOR_NAME=Executor
+EXECUTOR_NAMES = Encoder, Decoder
 READER_CONFIG_FILE=configs/my_configs/reader_config.txt
 WRITER_CONFIG_FILE=configs/xxx_configs/writer_config.txt
-EXECUTOR_CONFIG_FILE=configs/my_configs/executor_config.txt
+EXECUTOR_CONFIG_FILES = configs/my_configs/encoder_config.txt, configs/my_configs/decoder_config.txt

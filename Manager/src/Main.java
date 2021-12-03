@@ -23,8 +23,9 @@ public class Main {
                 if (!err.equals(RC.RC_SUCCESS)){
                     logger.severe(err.info);
                     System.out.println(err.info);
+                } else {
+                    System.out.println("Successfully finished processing");
                 }
-                System.out.println("Successfully finished processing");
 
             } catch (IOException e) {
                 System.out.println("Can't open log file");
