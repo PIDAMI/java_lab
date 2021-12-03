@@ -25,6 +25,7 @@ public class BaseGrammar {
     }
 
     public boolean isValidToken(String val) {
+
         return Arrays.asList(tokens).contains(val);
     }
 

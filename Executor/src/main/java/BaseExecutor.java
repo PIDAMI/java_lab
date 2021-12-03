@@ -4,12 +4,31 @@ import java.util.Arrays;
 
 public class BaseExecutor implements IExecutor {
 
+    public enum Action{
+        ENCODE(0,1),
+        DECODE(1,0);
+
+        public final int keyIndex;
+        public final int valIndex;
+        Action(int keyIndex, int valIndex){
+            this.keyIndex = keyIndex;
+            this.valIndex = valIndex;
+        }
+    }
+
+
     private final static TYPE[] SUPPORTED_TYPES = new TYPE[]{
             TYPE.BYTE_ARRAY,
             TYPE.CHAR_ARRAY };
+    private TYPE commonType;
+
     private IMediator readerMediator;
     private byte[] buffer;
-    private TYPE commonType;
+    private final Action action;
+    private Config cnfg;
+    private final SubstitutionTable table = new SubstitutionTable();
+    private final BaseGrammar grammar = new ExecutorGrammar();
+    private IConsumer consumer;
 
 
     private byte[] convertFromCommonToByte(Object data){
@@ -28,11 +47,13 @@ public class BaseExecutor implements IExecutor {
         this.action = action;
     }
 
+
     @Override
     public RC setProvider(IProvider provider) {
         commonType = (Caster.getCommonTypes(
                 provider.getOutputTypes(),
-                SUPPORTED_TYPES));
+                SUPPORTED_TYPES)
+        );
         if (commonType == null){
             return RC.RC_EXECUTOR_TYPES_INTERSECTION_EMPTY_ERROR;
         }
@@ -40,25 +61,39 @@ public class BaseExecutor implements IExecutor {
         return RC.RC_SUCCESS;
     }
 
+    @Override
+    public TYPE[] getOutputTypes() {
+        return Arrays.copyOf(SUPPORTED_TYPES,SUPPORTED_TYPES.length);
+    }
 
+    @Override
+    public IMediator getMediator(TYPE type) {
+        IMediator result = null;
+        switch (type){
+            case CHAR_ARRAY: result = new CharMediator(); break;
+            case BYTE_ARRAY: result = new ByteMediator(); break;
+        }
+        return result;
+    }
 
-    public enum Action{
-        ENCODE(0,1),
-        DECODE(1,0);
-
-        public final int keyIndex;
-        public final int valIndex;
-        Action(int keyIndex, int valIndex){
-            this.keyIndex = keyIndex;
-            this.valIndex = valIndex;
+    public class ByteMediator implements IMediator{
+        @Override
+        public Object getData() {
+            if (buffer == null)
+                return null;
+            return Arrays.copyOf(buffer,buffer.length);
         }
     }
 
-    private final Action action;
-    private Config cnfg;
-    private final SubstitutionTable table = new SubstitutionTable();
-    private final BaseGrammar grammar = new ExecutorGrammar();
-    private IConsumer consumer;
+    public class CharMediator implements IMediator{
+        @Override
+        public Object getData() {
+            if (buffer == null)
+                return null;
+            return Caster.bytesToChars(buffer,buffer.length);
+        }
+    }
+
 
     @Override
     public RC setConfig(String path) {
@@ -102,40 +137,6 @@ public class BaseExecutor implements IExecutor {
     public RC setConsumer(IConsumer iConsumer) {
         this.consumer = iConsumer;
         return this.consumer.setProvider(this);
-    }
-
-    @Override
-    public TYPE[] getOutputTypes() {
-        return Arrays.copyOf(SUPPORTED_TYPES,SUPPORTED_TYPES.length);
-    }
-
-    public class ByteMediator implements IMediator{
-        @Override
-        public Object getData() {
-            if (buffer == null)
-                return null;
-            return Arrays.copyOf(buffer,buffer.length);
-        }
-    }
-
-    public class CharMediator implements IMediator{
-        @Override
-        public Object getData() {
-            if (buffer == null)
-                return null;
-            return Caster.bytesToChars(buffer,buffer.length);
-        }
-    }
-
-
-    @Override
-    public IMediator getMediator(TYPE type) {
-        IMediator result = null;
-        switch (type){
-            case CHAR_ARRAY: result = new CharMediator(); break;
-            case BYTE_ARRAY: result = new ByteMediator(); break;
-        }
-        return result;
     }
 
 

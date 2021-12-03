@@ -13,7 +13,6 @@ public class Reader implements IReader{
     private final static TYPE[] SUPPORTED_TYPES =
             new TYPE[]{TYPE.CHAR_ARRAY, TYPE.BYTE_ARRAY, TYPE.INT_ARRAY};
 
-
     private InputStream inputStream;
     private byte[] buffer;
     private IConsumer consumer;
@@ -24,6 +23,24 @@ public class Reader implements IReader{
     private final static RC RC_READER_CLOSE_STREAM_ERROR = new RC(RC.RCWho.READER,
             RC.RCType.CODE_CUSTOM_ERROR,
             "Reader couldn't close stream.");
+
+
+    @Override
+    public TYPE[] getOutputTypes() {
+        return Arrays.copyOf(SUPPORTED_TYPES, SUPPORTED_TYPES.length);
+    }
+
+
+    @Override
+    public IMediator getMediator(TYPE type) {
+        IMediator result = null;
+        switch (type){
+            case CHAR_ARRAY: result = new CharMediator(); break;
+            case BYTE_ARRAY: result = new ByteMediator(); break;
+            case INT_ARRAY: result = new IntMediator(); break;
+        }
+        return result;
+    }
 
 
     public class ByteMediator implements IMediator{
@@ -47,6 +64,7 @@ public class Reader implements IReader{
         }
     }
 
+
     public class CharMediator implements IMediator{
         @Override
         public Object getData() {
@@ -56,6 +74,8 @@ public class Reader implements IReader{
             return Caster.bytesToChars(buffer,nonEmptyBufSize);
         }
     }
+
+
 
 
     @Override
@@ -86,22 +106,7 @@ public class Reader implements IReader{
         return this.consumer.setProvider(this);
     }
 
-    @Override
-    public TYPE[] getOutputTypes() {
-        return Arrays.copyOf(SUPPORTED_TYPES, SUPPORTED_TYPES.length);
-    }
 
-
-    @Override
-    public IMediator getMediator(TYPE type) {
-        IMediator result = null;
-        switch (type){
-            case CHAR_ARRAY: result = new CharMediator(); break;
-            case BYTE_ARRAY: result = new ByteMediator(); break;
-            case INT_ARRAY: result = new IntMediator(); break;
-        }
-        return result;
-    }
 
     @Override
     public RC setInputStream(InputStream inputStream) {
@@ -120,15 +125,11 @@ public class Reader implements IReader{
                 return RC.RC_READER_FAILED_TO_READ;
             }
 
-            if (consumer == null)
-                System.out.println("NULL CONSUMER IN READER");
             RC err = consumer.consume();
             if (!err.equals(RC.RC_SUCCESS))
                 return err;
         } while (nonEmptyBufSize > 0);
 
-//            if (!err.equals(RC.RC_SUCCESS))
-//            return err;
         return consumer.consume();
     }
 
