@@ -64,6 +64,8 @@ public class SubstitutionTable {
 
     public RC loadTable(BaseExecutor.Action action, String tablePath) {
 
+        if (tablePath == null)
+            return RC.RC_EXECUTOR_CONFIG_GRAMMAR_ERROR;
 
         try (Scanner scanner = new Scanner(new File(tablePath))) {
             String line;

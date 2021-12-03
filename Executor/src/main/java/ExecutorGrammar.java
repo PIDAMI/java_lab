@@ -1,6 +1,10 @@
 
 import com.java_polytech.pipeline_interfaces.RC;
+
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
+
 
 
 
@@ -15,11 +19,13 @@ public class ExecutorGrammar extends BaseGrammar {
 
     ExecutorGrammar() {
         super(Arrays.stream(ExecutorTokens.values())
-                    .map(Enum::toString)
-                    .toArray(String[]::new),
+                        .map(Enum::toString)
+                        .toArray(String[]::new),
                 RC.RC_EXECUTOR_CONFIG_GRAMMAR_ERROR,
                 RC.RC_EXECUTOR_CONFIG_FILE_ERROR,
                 RC_EXECUTOR_INCOMPLETE_CONFIG_ERROR);
     }
+
+
 
 }

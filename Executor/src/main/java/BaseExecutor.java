@@ -56,7 +56,6 @@ public class BaseExecutor implements IExecutor {
 
     private final Action action;
     private Config cnfg;
-    private String tablePath;
     private final SubstitutionTable table = new SubstitutionTable();
     private final BaseGrammar grammar = new ExecutorGrammar();
     private IConsumer consumer;
@@ -68,6 +67,7 @@ public class BaseExecutor implements IExecutor {
         if (!err.equals(RC.RC_SUCCESS))
             return err;
 
+        String tablePath = null;
         // if we've made it to this stage of program
         // it's guaranteed config has all token values and nothing else
         for (ExecutorGrammar.ExecutorTokens token:

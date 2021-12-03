@@ -1,8 +1,10 @@
 import com.java_polytech.pipeline_interfaces.*;
 
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.util.Arrays;
+import java.util.function.BiFunction;
+import java.util.function.BinaryOperator;
+import java.util.function.Supplier;
 
 
 public class Reader implements IReader{
@@ -88,7 +90,6 @@ public class Reader implements IReader{
     public TYPE[] getOutputTypes() {
         return Arrays.copyOf(SUPPORTED_TYPES, SUPPORTED_TYPES.length);
     }
-
 
 
     @Override
