@@ -19,8 +19,10 @@ public class Config {
     public RC ParseConfig(String path){
         try (Scanner scanner = new Scanner(new File(path))){
             String line;
+            int numLines = 0;
             while (scanner.hasNext()){
                 line = scanner.nextLine();
+                numLines++;
                 String[] tokens = Arrays.stream(line
                                 .split(BaseGrammar.DEMILIMITER))
                         .map(String::trim)
@@ -28,6 +30,7 @@ public class Config {
                 if (tokens.length != 2)
                     return grammar.getGrammarErrorCode();
                 if (!grammar.isValidToken(tokens[0])){
+                    System.out.println("Invalid config value at line " + numLines+ " :" + tokens[0]);
                     return grammar.getGrammarErrorCode();
                 }
                 this.params.put(tokens[0],tokens[1]);

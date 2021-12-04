@@ -23,7 +23,7 @@
     <orderEntry type="module-library">
       <library name="Maven: com.java_polytech:pipeline_interfaces:1.0">
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/libs/PipelineInterfaces.jar!/" />
+          <root url="jar://$MODULE_DIR$/libs/SyntaxAnalizer.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />

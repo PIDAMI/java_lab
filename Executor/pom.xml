@@ -19,6 +19,16 @@
                 ${basedir}/libs/PipelineInterfaces.jar
             </systemPath>
         </dependency>
+
+        <dependency>
+            <groupId>com.java_polytech</groupId>
+            <artifactId>pipeline_interfaces</artifactId>
+            <version>1.0</version>
+            <scope>system</scope>
+            <systemPath>
+                ${basedir}/libs/SyntaxAnalizer.jar
+            </systemPath>
+        </dependency>
     </dependencies>
 
     <properties>

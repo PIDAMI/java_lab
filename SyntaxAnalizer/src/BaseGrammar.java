@@ -1,4 +1,4 @@
-import com.java_polytech.pipeline_interfaces.*;
+import com.java_polytech.pipeline_interfaces.RC;
 
 import java.util.Arrays;
 
@@ -21,9 +21,7 @@ public class BaseGrammar {
         this.incompleteConfigError = incompleteConfigError;
     }
 
-    public boolean isValidToken(String val) {
-        return Arrays.asList(tokens).contains(val);
-    }
+    public boolean isValidToken(String val) {return Arrays.asList(tokens).contains(val);}
     public final int getNumTokens() {
         return this.tokens == null ? 0 : this.tokens.length;
     }
