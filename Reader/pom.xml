@@ -24,7 +24,7 @@
             <version>1.0</version>
             <scope>system</scope>
             <systemPath>
-                ${basedir}/libs/SyntaxAnalyzer.jar
+                ${basedir}/libs/SyntaxAnalizer.jar
             </systemPath>
         </dependency>
 

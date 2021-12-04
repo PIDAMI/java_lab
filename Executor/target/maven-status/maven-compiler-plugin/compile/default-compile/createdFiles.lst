@@ -1,8 +1,6 @@
-Config.class
+SubstitutionTable.class
 Executor$Action.class
 Executor$1.class
 ExecutorGrammar.class
 ExecutorGrammar$ExecutorTokens.class
 Executor.class
-SubstitutionTable.class
-AbstractGrammar.class

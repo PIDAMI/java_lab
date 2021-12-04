@@ -12,24 +12,13 @@ public class Reader implements IReader{
     private byte[] buffer;
     private IConsumer consumer;
     private Config cnfg;
-    private final AbstractGrammar grammar = new ReaderGrammar();
+    private final BaseGrammar grammar = new ReaderGrammar();
 
 
     private final static RC RC_READER_CLOSE_STREAM_ERROR = new RC(RC.RCWho.READER,
             RC.RCType.CODE_CUSTOM_ERROR,
             "Reader couldn't close stream.");
 
-
-    private RC CloseStream(){
-        RC err;
-        try {
-            this.inputStream.close();
-            err = RC.RC_SUCCESS;
-        } catch (IOException e) {
-            err = RC_READER_CLOSE_STREAM_ERROR;
-        }
-        return err;
-    }
 
     @Override
     public RC setConfig(String cnfg) {
@@ -83,7 +72,6 @@ public class Reader implements IReader{
         RC err = consumer.consume(null); // reached file's end
         if (!err.equals(RC.RC_SUCCESS))
             return err;
-        err = CloseStream();
         return err;
     }
 

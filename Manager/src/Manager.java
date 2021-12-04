@@ -45,7 +45,7 @@ public class Manager implements IConfigurable {
     private IExecutor executor;
     private IWriter writer;
 
-    private AbstractGrammar grammar = new ManagerGrammar();
+    private BaseGrammar grammar = new ManagerGrammar();
 
 
     @Override

@@ -2,7 +2,7 @@ import com.java_polytech.pipeline_interfaces.RC;
 
 import java.util.Arrays;
 
-public class ReaderGrammar extends AbstractGrammar{
+public class ReaderGrammar extends BaseGrammar{
 
     public enum ReaderTokens {
         BUFFER_SIZE

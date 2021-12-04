@@ -10,7 +10,7 @@ public class Writer implements IWriter{
 
     private OutputStream outputStream;
     private Config cnfg;
-    private final AbstractGrammar grammar = new WriterGrammar();
+    private final BaseGrammar grammar = new WriterGrammar();
 
     private final static RC RC_WRITER_CLOSE_STREAM_ERROR =  new RC(
             RC.RCWho.WRITER,
@@ -34,8 +34,9 @@ public class Writer implements IWriter{
 
     @Override
     public RC consume(byte[] bytes) {
-//        if (bytes == null)
-//            return CloseStream();
+
+        if (bytes == null)
+            return RC.RC_SUCCESS;
         try {
             outputStream.write(bytes);
         } catch (IOException e) {
