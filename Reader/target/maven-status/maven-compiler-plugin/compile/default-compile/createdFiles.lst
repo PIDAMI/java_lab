@@ -1,6 +1,4 @@
-Config.class
 Caster.class
-BaseGrammar.class
 Reader$CharMediator.class
 ReaderGrammar$ReaderTokens.class
 ReaderGrammar.class

@@ -1,6 +1,4 @@
 WriterGrammar.class
-Config.class
 Caster.class
-BaseGrammar.class
 WriterGrammar$WriterTokens.class
 Writer.class
