@@ -1,15 +1,15 @@
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Scanner;
+import java.util.*;
 
 import com.java_polytech.pipeline_interfaces.*;
 
 // syntax analyzer
 public class Config {
 
-    private final HashMap<String, String> params = new HashMap<>();
+
+
+    private final HashMap<String, String[]> params = new HashMap<>();
     private final BaseGrammar grammar;
 
     public Config(BaseGrammar grammar){
@@ -30,10 +30,13 @@ public class Config {
                 if (tokens.length != 2)
                     return grammar.getGrammarErrorCode();
                 if (!grammar.isValidToken(tokens[0])){
-                    System.out.println("Invalid config value at line " + numLines+ " :" + tokens[0]);
                     return grammar.getGrammarErrorCode();
                 }
-                this.params.put(tokens[0],tokens[1]);
+                String[] tokenValues = Arrays
+                        .stream(tokens[1].split(BaseGrammar.TOKEN_VALUE_DELIMITER))
+                        .map(String::trim)
+                        .toArray(String[]::new);
+                this.params.put(tokens[0],tokenValues);
             }
 
             if (this.params.size() != grammar.getNumTokens()){
@@ -49,5 +52,5 @@ public class Config {
 
 
 
-    public String get(String key) { return params.get(key);}
+    public String[] get(String key) { return params.get(key);}
 }
