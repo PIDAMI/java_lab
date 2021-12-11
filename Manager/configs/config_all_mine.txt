@@ -1,7 +1,7 @@
 # this is a comment
   # as well as this
 INPUT_FILE = tmp.txt
-OUTPUT_FILE = decoded.txt
+OUTPUT_FILE = out.txt
 READER_NAME = Reader
 WRITER_NAME = Writer
 EXECUTOR_NAMES = Executor
