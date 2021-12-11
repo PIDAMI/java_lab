@@ -22,20 +22,23 @@ public class Config {
             String line;
             while (scanner.hasNext()){
                 line = scanner.nextLine();
+                if (line.trim().startsWith(grammar.COMMENT_PREFIX)
+                || line.trim().length() == 0)
+                    continue;
                 String[] tokens = Arrays.stream(line
                                 .split(BaseGrammar.DEMILIMITER))
                         .map(String::trim)
                         .toArray(String[]::new);
                 if (tokens.length != 2)
                     return grammar.getGrammarErrorCode();
-                if (!grammar.isValidToken(tokens[0])){
-                    return grammar.getGrammarErrorCode();
+                if (grammar.isValidToken(tokens[0])){
+                    String[] tokenValues = Arrays
+                            .stream(tokens[1].split(BaseGrammar.TOKEN_VALUE_DELIMITER))
+                            .map(String::trim)
+                            .toArray(String[]::new);
+                    this.params.put(tokens[0],tokenValues);
+
                 }
-                String[] tokenValues = Arrays
-                        .stream(tokens[1].split(BaseGrammar.TOKEN_VALUE_DELIMITER))
-                        .map(String::trim)
-                        .toArray(String[]::new);
-                this.params.put(tokens[0],tokenValues);
             }
 
             if (this.params.size() != grammar.getNumTokens()){

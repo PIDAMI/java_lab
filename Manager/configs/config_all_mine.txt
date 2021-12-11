@@ -1,3 +1,10 @@
+# this is a comment
+
+# you can only write comments on separate lines
+
+# order of executors is configured the same as
+# the order in which they are enumerated in this file
+
 INPUT_FILE = output.txt
 OUTPUT_FILE = decoded.txt
 READER_NAME = Reader
