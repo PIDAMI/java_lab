@@ -4,10 +4,10 @@ import java.io.*;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
+import java.util.List;
+import java.util.stream.Stream;
 
 public class Manager implements IConfigurable {
-
-
 
 
     private static final RC RC_MANAGER_READER_NAME_ERROR = new RC(
@@ -38,11 +38,11 @@ public class Manager implements IConfigurable {
     private String writerConfig;
 
     private String readerName;
-    private String executorName;
+    private String[] executorName;
     private String writerName;
 
     private IReader reader;
-    private IExecutor executor;
+    private IExecutor[] executor;
     private IWriter writer;
 
     private BaseGrammar grammar = new ManagerGrammar();
@@ -50,6 +50,7 @@ public class Manager implements IConfigurable {
 
     @Override
     public RC setConfig(String path) {
+        
         Config cnfg = new Config(grammar);
         RC err = cnfg.ParseConfig(path);
         if (err != RC.RC_SUCCESS){

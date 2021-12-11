@@ -4,6 +4,9 @@ import com.java_polytech.pipeline_interfaces.RC;
 
 public class Executor implements IExecutor {
 
+
+
+
     public enum Action{
         ENCODE(0,1),
         DECODE(1,0);
@@ -40,16 +43,19 @@ public class Executor implements IExecutor {
         // it's guaranteed config has all token values and nothing else
         for (ExecutorGrammar.ExecutorTokens token:
                 ExecutorGrammar.ExecutorTokens.values()){
+            String[] vals = cnfg.get(token.toString());
+            if (vals.length != 1)
+                return RC.RC_EXECUTOR_CONFIG_SEMANTIC_ERROR;
             switch (token){
                 case ACTION:
                     try{
-                        action = Action.valueOf(cnfg.get(token.toString()));
+                        action = Action.valueOf(vals[0]);
                     } catch (IllegalArgumentException e){
                         return RC_INVALID_ACTION;
                     }
                     break;
                 case TABLE_PATH:
-                    tablePath = cnfg.get(token.toString());
+                    tablePath = vals[0];
                     break;
             }
         }

@@ -7,8 +7,6 @@ import com.java_polytech.pipeline_interfaces.*;
 // syntax analyzer
 public class Config {
 
-
-
     private final HashMap<String, String[]> params = new HashMap<>();
     private final BaseGrammar grammar;
 
@@ -22,6 +20,8 @@ public class Config {
             int numLines = 0;
             while (scanner.hasNext()){
                 line = scanner.nextLine();
+                if (line.startsWith(BaseGrammar.COMMENTARY_PREFIX))
+                    continue;
                 numLines++;
                 String[] tokens = Arrays.stream(line
                                 .split(BaseGrammar.DEMILIMITER))
@@ -29,14 +29,13 @@ public class Config {
                         .toArray(String[]::new);
                 if (tokens.length != 2)
                     return grammar.getGrammarErrorCode();
-                if (!grammar.isValidToken(tokens[0])){
-                    return grammar.getGrammarErrorCode();
+                if (grammar.isValidToken(tokens[0])){
+                    String[] tokenValues = Arrays
+                            .stream(tokens[1].split(BaseGrammar.TOKEN_VALUE_DELIMITER))
+                            .map(String::trim)
+                            .toArray(String[]::new);
+                    this.params.put(tokens[0],tokenValues);
                 }
-                String[] tokenValues = Arrays
-                        .stream(tokens[1].split(BaseGrammar.TOKEN_VALUE_DELIMITER))
-                        .map(String::trim)
-                        .toArray(String[]::new);
-                this.params.put(tokens[0],tokenValues);
             }
 
             if (this.params.size() != grammar.getNumTokens()){

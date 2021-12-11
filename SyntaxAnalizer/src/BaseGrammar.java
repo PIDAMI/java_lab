@@ -8,7 +8,7 @@ public class BaseGrammar {
     private final String[] tokens;
     public final static String DEMILIMITER = "=";
     public final static String TOKEN_VALUE_DELIMITER = ",";
-
+    public final static String COMMENTARY_PREFIX = "#";
 
     private final RC grammarError;
     private final RC noFileError;
