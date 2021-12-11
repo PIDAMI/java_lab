@@ -10,6 +10,17 @@ import java.util.stream.Stream;
 public class Manager implements IConfigurable {
 
 
+    private final static RC RC_MANAGER_CLOSE_OUTSTREAM_ERROR =  new RC(
+            RC.RCWho.MANAGER,
+            RC.RCType.CODE_CUSTOM_ERROR,
+            "Couldn't close output stream.");
+
+    private final static RC RC_MANAGER_CLOSE_INSTREAM_ERROR = new RC(
+            RC.RCWho.MANAGER,
+            RC.RCType.CODE_CUSTOM_ERROR,
+            "Couldn't close input stream.");
+
+
     private static final RC RC_MANAGER_READER_NAME_ERROR = new RC(
             RC.RCWho.MANAGER,
             RC.RCType.CODE_CUSTOM_ERROR,
@@ -34,15 +45,15 @@ public class Manager implements IConfigurable {
     private OutputStream outputStream;
     private InputStream inputStream;
     private String readerConfig;
-    private String executorConfig;
+    private String[] executorConfigs;
     private String writerConfig;
 
     private String readerName;
-    private String[] executorName;
+    private String[] executorNames;
     private String writerName;
 
     private IReader reader;
-    private IExecutor[] executor;
+    private IExecutor[] executors;
     private IWriter writer;
 
     private BaseGrammar grammar = new ManagerGrammar();
@@ -61,42 +72,44 @@ public class Manager implements IConfigurable {
         // it's guaranteed config has all token values and nothing else
         for (ManagerGrammar.ManagerTokens token:
                 ManagerGrammar.ManagerTokens.values()){
+            String[] tokenValues = cnfg.get(token.toString());
+            if (token.hasSingleValue && tokenValues.length != 1){
+                err = RC.RC_MANAGER_CONFIG_GRAMMAR_ERROR;
+                return err;
+            }
+
             switch (token){
                 case READER_NAME:
-                    this.readerName = cnfg.get(token.toString());
+                    this.readerName = tokenValues[0];
                     break;
                 case WRITER_NAME:
-                    this.writerName = cnfg.get(token.toString());
+                    this.writerName = tokenValues[0];
                     break;
-                case EXECUTOR_NAME:
-                    this.executorName = cnfg.get(token.toString());
+                case EXECUTOR_NAMES:
+                    this.executorNames = tokenValues;
                     break;
                 case INPUT_FILE:
                     try {
-                        this.inputStream = new FileInputStream(
-                                cnfg.get(token.toString())
-                        );
+                        this.inputStream = new FileInputStream(tokenValues[0]);
                     } catch (FileNotFoundException e) {
                         return RC.RC_MANAGER_INVALID_INPUT_FILE;
                     }
                     break;
                 case OUTPUT_FILE:
                     try {
-                        this.outputStream = new FileOutputStream(
-                                cnfg.get(token.toString())
-                        );
+                        this.outputStream = new FileOutputStream(tokenValues[0]);
                     } catch (FileNotFoundException e) {
                         return RC.RC_MANAGER_INVALID_OUTPUT_FILE;
                     }
                     break;
                 case READER_CONFIG_FILE:
-                    this.readerConfig = cnfg.get(token.toString());
+                    this.readerConfig = tokenValues[0];
                     break;
                 case WRITER_CONFIG_FILE:
-                    this.writerConfig = cnfg.get(token.toString());
+                    this.writerConfig = tokenValues[0];
                     break;
-                case EXECUTOR_CONFIG_FILE:
-                    this.executorConfig = cnfg.get(token.toString());
+                case EXECUTOR_CONFIG_FILES:
+                    this.executorConfigs = tokenValues;
                     break;
             }
         }
@@ -116,7 +129,6 @@ public class Manager implements IConfigurable {
     }
 
     private RC setReader(){
-
         RC err = reader.setConfig(readerConfig);
         if (!err.equals(RC.RC_SUCCESS))
             return err;
@@ -125,25 +137,58 @@ public class Manager implements IConfigurable {
         if (!err.equals(RC.RC_SUCCESS))
             return err;
 
-        return reader.setConsumer(executor);
+        reader.setConsumer(executors[0]);
+        return err;
     }
 
     private RC setWriter(){
-
-        RC err = this.writer.setConfig(this.writerConfig);
+        RC err = writer.setConfig(writerConfig);
         if (!err.equals(RC.RC_SUCCESS))
             return err;
-        return this.writer.setOutputStream(this.outputStream);
-    }
-
-    private RC setExecutor(){
-
-        RC err = this.executor.setConfig(this.executorConfig);
+        err = writer.setOutputStream(outputStream);
         if (!err.equals(RC.RC_SUCCESS))
             return err;
-        return this.executor.setConsumer(this.writer);
+        return err;
     }
 
+    private RC setExecutors(){
+
+        RC err = RC.RC_SUCCESS;
+        if (executorNames.length != executorConfigs.length)
+            return RC.RC_MANAGER_CONFIG_SEMANTIC_ERROR;
+
+        for (int i = 0; i < executors.length; i++){
+            err = executors[i].setConfig(executorConfigs[i]);
+            if (!err.equals(RC.RC_SUCCESS))
+                return err;
+
+            if (i == executors.length - 1)
+                err = executors[i].setConsumer(writer);
+            else
+                err = executors[i].setConsumer(executors[i+1]);
+
+            if (!err.equals(RC.RC_SUCCESS))
+                return err;
+        }
+        return err;
+    }
+
+
+
+    public RC CloseStreams(){
+        RC err = RC.RC_SUCCESS;
+        try {
+            inputStream.close();
+        } catch (IOException e) {
+            err = RC_MANAGER_CLOSE_INSTREAM_ERROR;
+        }
+        try {
+            outputStream.close();
+        } catch (IOException e) {
+            err = RC_MANAGER_CLOSE_OUTSTREAM_ERROR;
+        }
+        return err;
+    }
 
     public RC BuildPipeline(String path) {
 
@@ -156,16 +201,23 @@ public class Manager implements IConfigurable {
         } catch (ClassNotFoundException | NoSuchMethodException |
                 InvocationTargetException | InstantiationException |
                 IllegalAccessException e) {
-            return RC_MANAGER_READER_NAME_ERROR;
+            err = RC_MANAGER_READER_NAME_ERROR;
+            return err;
         }
 
-        try {
-            executor = (IExecutor) createConfigurable(executorName);
-        } catch (ClassNotFoundException | NoSuchMethodException |
-                InvocationTargetException | InstantiationException |
-                IllegalAccessException e) {
-            return RC_MANAGER_EXECUTOR_NAME_ERROR;
+        executors = new IExecutor[executorNames.length];
+        for (int i = 0; i < executorNames.length; i++){
+            try {
+                executors[i] = (IExecutor) createConfigurable(executorNames[i]);
+            } catch (ClassNotFoundException | NoSuchMethodException |
+                    InvocationTargetException | InstantiationException |
+                    IllegalAccessException e) {
+                err = new RC(RC.RCWho.MANAGER, RC.RCType.CODE_CUSTOM_ERROR,
+                        "Can't make instance of executor named " + executorNames[i]);
+                return err;
+            }
         }
+
 
         try {
             writer = (IWriter) createConfigurable(writerName);
@@ -176,13 +228,14 @@ public class Manager implements IConfigurable {
         }
 
 
+
         err = setReader();
         if (!err.equals(RC.RC_SUCCESS))
             return err;
 
 
 
-        err = setExecutor();
+        err = setExecutors();
         if (!err.equals(RC.RC_SUCCESS))
             return err;
 
@@ -192,7 +245,9 @@ public class Manager implements IConfigurable {
         if (!err.equals(RC.RC_SUCCESS))
             return err;
 
-        return reader.run();
+        err = reader.run();
+
+        return err;
     }
 
 }

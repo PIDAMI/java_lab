@@ -16,8 +16,17 @@ public class Main {
        } else {
             Manager m = new Manager();
             RC err = m.BuildPipeline(args[0]);
-            if (!err.equals(RC.RC_SUCCESS))
+            if (!err.equals(RC.RC_SUCCESS)){
                 System.out.println(err.info);
+            }
+            else{
+                err = m.CloseStreams();
+                if (!err.equals(RC.RC_SUCCESS))
+                    System.out.println(err.info);
+                else
+                    System.out.println("Successfully processed!");
+            }
+
         }
     }
 }

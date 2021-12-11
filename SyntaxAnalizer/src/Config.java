@@ -20,7 +20,8 @@ public class Config {
             int numLines = 0;
             while (scanner.hasNext()){
                 line = scanner.nextLine();
-                if (line.startsWith(BaseGrammar.COMMENTARY_PREFIX))
+                if (line.trim().length() == 0
+                || line.trim().startsWith(BaseGrammar.COMMENTARY_PREFIX))
                     continue;
                 numLines++;
                 String[] tokens = Arrays.stream(line

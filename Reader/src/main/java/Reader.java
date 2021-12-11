@@ -2,6 +2,7 @@ import com.java_polytech.pipeline_interfaces.IConsumer;
 import com.java_polytech.pipeline_interfaces.IReader;
 import com.java_polytech.pipeline_interfaces.RC;
 
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;

@@ -6,15 +6,24 @@ import java.util.Arrays;
 public class ManagerGrammar extends BaseGrammar {
 
 
+    // maybe hasSingleValue name should be named
+    // canOnlyHaveSingleValue
     public enum ManagerTokens {
-        READER_NAME,
-        EXECUTOR_NAME,
-        WRITER_NAME,
-        INPUT_FILE,
-        OUTPUT_FILE,
-        READER_CONFIG_FILE,
-        WRITER_CONFIG_FILE,
-        EXECUTOR_CONFIG_FILE
+        READER_NAME(true),
+        EXECUTOR_NAMES(false),
+        WRITER_NAME(true),
+        INPUT_FILE(true),
+        OUTPUT_FILE(true),
+        READER_CONFIG_FILE(true),
+        WRITER_CONFIG_FILE(true),
+        EXECUTOR_CONFIG_FILES(false);
+
+
+        public final boolean hasSingleValue;
+        ManagerTokens(boolean hasSingleValue){
+            this.hasSingleValue=hasSingleValue;
+        }
+
     }
 
     private final static RC RC_MANAGER_INCOMPLETE_CONFIG_ERROR = new RC(
