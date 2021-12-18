@@ -12,11 +12,16 @@ public class SubstitutionTable {
 
 
     public static final String TABLE_DELIMITER="=";
-    public static final int TABLE_SIZE = 256;
+    public static final int MAX_TABLE_SIZE = 256;
+
+    private final static RC RC_NON_BIJECTIVE_TABLE = new RC(RC.RCWho.EXECUTOR,
+            RC.RCType.CODE_CUSTOM_ERROR,
+            "Table is not bijective");
 
     private final static RC RC_INVALID_TABLE_SIZE = new RC(RC.RCWho.EXECUTOR,
             RC.RCType.CODE_CUSTOM_ERROR,
-            "Invalid table: there must be " + TABLE_SIZE + "unique entries");
+            "Invalid table: there must be less than " + MAX_TABLE_SIZE +
+                    "unique entries");
     private final static RC RC_INVALID_TABLE_VALUE = new RC(RC.RCWho.EXECUTOR,
             RC.RCType.CODE_CUSTOM_ERROR,
             "Invalid table format: tokens must be decimal integers in range -127 to 128");
@@ -27,22 +32,22 @@ public class SubstitutionTable {
 
 
     public Byte get(Byte key){
-        return table.get(key);
+        Byte val = table.get(key);
+        return val == null? key : val;
     }
 
-    // check if table is bijection and 256 elements long
+    // check if table is bijection and less than 256 elements long
     public static RC isValidTable(HashMap<Byte,Byte> table){
 
-        // valid table is basically 2 permutations which means
-        // 2 sets(contain distinct values), each has alphabet's size (256, byte's size)
-        if (table.size() != TABLE_SIZE){
+        // valid table is basically 2 permutations(of same subset of 256 bytes)
+        // which means 2 sets(contain distinct values)
+        // each has <= 256 size
+        if (table.size() > MAX_TABLE_SIZE){
             return RC_INVALID_TABLE_SIZE;
         }
 
-        int unique_values = new HashSet<>(table.values()).size();
-
-        if (unique_values != TABLE_SIZE)
-            return RC_INVALID_TABLE_SIZE;
+        if (!table.keySet().equals(new HashSet<>(table.values())))
+            return RC_NON_BIJECTIVE_TABLE;
         else {
             return RC.RC_SUCCESS;
         }
