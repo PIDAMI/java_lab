@@ -11,7 +11,7 @@ public class BaseGrammar {
     public final static String DEMILIMITER = "=";
     // for splitting token's value (for executor names, executor configs)
     public final static String TOKEN_VALUE_DELIMITER = ",";
-
+    public final static String COMMENT_PREFIX = "#";
     private final RC grammarError;
     private final RC noFileError;
     private final RC incompleteConfigError;
@@ -25,7 +25,6 @@ public class BaseGrammar {
     }
 
     public boolean isValidToken(String val) {
-
         return Arrays.asList(tokens).contains(val);
     }
 

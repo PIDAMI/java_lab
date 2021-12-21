@@ -21,9 +21,18 @@
       </library>
     </orderEntry>
     <orderEntry type="module-library">
+      <library>
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/libs/SyntaxAnalyzer.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
       <library name="Maven: com.java_polytech:pipeline_interfaces:1.0">
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/libs/Pipeline2Interfaces.jar!/" />
+          <root url="jar://$MODULE_DIR$/libs/SyntaxAnalyzer.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />

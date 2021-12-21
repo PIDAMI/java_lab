@@ -19,6 +19,25 @@
                 ${basedir}/libs/Pipeline2Interfaces.jar
             </systemPath>
         </dependency>
+        <dependency>
+            <groupId>com.java_polytech</groupId>
+            <artifactId>pipeline_interfaces</artifactId>
+            <version>1.0</version>
+            <scope>system</scope>
+            <systemPath>
+                ${basedir}/libs/Pipeline2Interfaces.jar
+            </systemPath>
+        </dependency>
+        <dependency>
+            <groupId>com.java_polytech</groupId>
+            <artifactId>pipeline_interfaces</artifactId>
+            <version>1.0</version>
+            <scope>system</scope>
+            <systemPath>
+                ${basedir}/libs/SyntaxAnalyzer.jar
+            </systemPath>
+        </dependency>
+
     </dependencies>
 
     <properties>
